@@ -1,0 +1,50 @@
+[
+    {
+        "id": 0,
+        "category": "all"
+    },
+    {
+        "id": 1,
+        "category": "chicken"
+    },
+    {
+        "id": 2,
+        "category": "breakfast"
+    },
+    {
+        "id": 3,
+        "category": "snacks"
+    },
+    {
+        "id": 4,
+        "category": "seafood"
+    },
+    {
+        "id": 5,
+        "category": "desserts"
+    },
+    {
+        "id": 6,
+        "category": "drinks"
+    },
+    {
+        "id": 7,
+        "category": "sauces"
+    },
+    {
+        "id": 8,
+        "category": "sides"
+    },
+    {
+        "id": 9,
+        "category": "specials"
+    },
+    {
+        "id": 10,
+        "category": "new"
+    },
+    {
+        "id": 11,
+        "category": "limited-time"
+    }
+]
