@@ -1,5 +1,5 @@
 import { Text, View } from 'react-native';
-import { IconSymbol } from '../ui/icon-symbol';
+import { ChevronDown, Bell } from 'lucide-react-native';
 
 export function Header() {
   return (
@@ -9,12 +9,12 @@ export function Header() {
         <Text className='mb-1'>Good Morning</Text>
         <View className="flex-row items-center gap-2">
           <Text className="text-xl font-bold text-gray-600">Qusai Mansoor</Text>
-          <IconSymbol name='arrow.down' size={12} color="#718096" />
+          <ChevronDown size={16} color="#718096" />
         </View>
 
       </View>
       <View>
-        <IconSymbol name="bell" size={24} color="#EF4444" />
+        <Bell size={24} color="#EF4444" />
       </View>
     </View>
   );

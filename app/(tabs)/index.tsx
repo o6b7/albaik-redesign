@@ -7,6 +7,8 @@ import { CategoryTabs } from '@/components/home/CategoryTabs';
 import { FeaturedList } from '@/components/home/FeaturedList';
 import { MoreList } from '@/components/home/MoreList';
 
+import featuredMeals from '@/components/home/data/featuredMeals.json';
+
 export default function HomeScreen() {
   // We use ScrollView so the content is scrollable when it overflows the screen height
   return (
@@ -18,7 +20,7 @@ export default function HomeScreen() {
         <Header />
         <SearchBar />
         <CategoryTabs />
-        <FeaturedList />
+        <FeaturedList meals={featuredMeals.slice(0, 4)} />
         <MoreList />
       </ScrollView>
     </SafeAreaView>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
-import categories from './categories.json';
+import categories from './data/categories.json';
 
 export function CategoryTabs() {
   const [activeCategory, setActiveCategory] = useState('all');

@@ -1,0 +1,52 @@
+[
+    {
+        "id": 0,
+        "name": "Big Baik",
+        "description": "Chicken with more",
+        "price": "12",
+        "currency": "SAR",
+        "image": "../../assets/menu/bigBaik.png",
+        "rating": 4.5,
+        "reviews": 54
+    },
+    {
+        "id": 1,
+        "name": "Super Baik",
+        "description": "Grilled chicken with more",
+        "price": "13",
+        "currency": "SAR",
+        "image": "../../assets/menu/superBaik.png",
+        "rating": 4.8,
+        "reviews": 66
+    },
+    {
+        "id": 2,
+        "name": "Crispy Baik",
+        "description": "Crispy chicken with more",
+        "price": "6.5",
+        "currency": "SAR",
+        "image": "../../assets/menu/crispyBaik.png",
+        "rating": 4.4,
+        "reviews": 77
+    },
+    {
+        "id": 3,
+        "name": "Chicken Fillet",
+        "description": "2 pcs Chicken Fillet",
+        "price": "17",
+        "currency": "SAR",
+        "image": "../../assets/menu/chickenFillet.png",
+        "rating": 4.9,
+        "reviews": 120
+    },
+    {
+        "id": 4,
+        "name": "Super Fillet",
+        "description": "2 pcs Super Fillet",
+        "price": "15",
+        "currency": "SAR",
+        "image": "../../assets/menu/chickenFillet.png",
+        "rating": 4.9,
+        "reviews": 120
+    }
+]
