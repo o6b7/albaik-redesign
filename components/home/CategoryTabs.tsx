@@ -20,7 +20,7 @@ export function CategoryTabs() {
           return (
             <TouchableOpacity
               onPress={() => setActiveCategory(item.category)}
-              className={`px-4 py-2 rounded-2xl mr-2 ${isActive ? 'bg-red-500' : 'bg-gray-300'
+              className={`px-4 py-2 rounded-2xl mr-2 ${isActive ? 'bg-red-500' : ''
                 }`}
             >
               <Text

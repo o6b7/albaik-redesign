@@ -1,0 +1,18 @@
+export const menuImages: Record<string, any> = {
+  bigBaik: require('../assets/menu/bigBaik.png'),
+  superBaik: require('../assets/menu/superBaik.png'),
+  crispyBaik: require('../assets/menu/crispyBaik.png'),
+  chickenFillet: require('../assets/menu/chickenFillet.png'),
+  superShrimp: require('../assets/menu/superShrimp.png'),
+  eightPcsChicken: require('../assets/menu/8pcsChicken.png'),
+  chickenNuggets: require('../assets/menu/chickenNuggets.png'),
+  broastedShrimp: require('../assets/menu/broastedShrimp.png'),
+  doubleBurger: require('../assets/menu/doubleBurger.png'),
+  fishFillet: require('../assets/menu/fishFillet.png'),
+  caleslaw: require('../assets/menu/caleslaw.png'),
+  cornCup: require('../assets/menu/cornCup.png'),
+  icecream: require('../assets/menu/icecream.png'),
+  fries: require('../assets/menu/fries.png'),
+  chips: require('../assets/menu/chips.png'),
+  hummus: require('../assets/menu/hummus.png'),
+};

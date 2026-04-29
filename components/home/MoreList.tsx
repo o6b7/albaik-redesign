@@ -1,14 +1,17 @@
-import { Image, Text, View } from 'react-native';
+import { FlatList } from 'react-native';
+
+import moreMeals from './data/moreMeals.json';
+import { MoreCard } from './MoreCard';
 
 export function MoreList() {
   return (
-    <View className="py-12 bg-gray-100 rounded-md mb-2 items-center justify-center">
-      <View className=''>
-        <View className='items-center'>
-          <Image source={require("../../assets/menu/bigBaik.png")} className='w-32 h-32' />
-          <Text>More</Text>
-        </View>
-      </View>
-    </View>
+    <FlatList
+      data={moreMeals}
+      keyExtractor={(item) => item.id.toString()}
+      renderItem={({ item }) => <MoreCard meal={item} />}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={{ gap: 20, paddingHorizontal: 16, paddingVertical: 16 }}
+    />
   );
 }
