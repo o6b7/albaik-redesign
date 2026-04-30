@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { Heart, Star } from 'lucide-react-native';
 import { useState } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
@@ -7,10 +8,15 @@ import { Meal } from './types';
 
 export function MealCard({ meal }: { meal: Meal }) {
   const [isLiked, setIsLiked] = useState(false);
+  const router = useRouter();
 
   return (
-    <View className="py-4 bg-gray-100 rounded-md items-center justify-center">
-      <View className='bg-red-500 rounded-3xl w-[210px] h-[260px] p-5 justify-between'>
+    <TouchableOpacity
+      className="py-4 bg-gray-100 rounded-md items-center justify-center"
+      activeOpacity={0.9}
+      onPress={() => router.push(`/meal/${meal.id}?type=featured`)}
+    >
+      <View style={{ backgroundColor: meal.bgColor ?? '#8A151B' }} className="rounded-3xl w-[210px] h-[260px] p-5 justify-between">
         <View className='flex-row justify-between shrink'>
           <View className='flex-1 pr-2'>
             <Text className='font-bold text-lg text-white' numberOfLines={1}>{meal.name}</Text>
@@ -46,6 +52,6 @@ export function MealCard({ meal }: { meal: Meal }) {
           </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }

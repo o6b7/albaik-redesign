@@ -1,12 +1,13 @@
 export interface Meal {
   id: number;
   name: string;
-  description: string;
+  description?: string;
   price: string;
   currency: string;
   image: string;
   rating: number;
   reviews: number;
+  bgColor?: string;
 }
 
 export interface SideMeal {
@@ -17,4 +18,5 @@ export interface SideMeal {
   image: string;
   rating: number;
   reviews: number;
+  bgColor?: string;
 }

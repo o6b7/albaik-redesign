@@ -1,12 +1,19 @@
+import { useRouter } from 'expo-router';
 import { Star } from 'lucide-react-native';
-import { Image, Text, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 
 import { menuImages } from '@/constants/images';
 import { SideMeal } from './types';
 
 export function MoreCard({ meal }: { meal: SideMeal }) {
+  const router = useRouter();
+
   return (
-    <View className='rounded-3xl p-4 bg-[#FDFFFF] w-44 h-52 justify-between'>
+    <TouchableOpacity
+      className='rounded-3xl p-4 bg-[#FDFFFF] w-44 h-52 justify-between'
+      activeOpacity={0.85}
+      onPress={() => router.push(`/meal/${meal.id}?type=more`)}
+    >
       <View className='items-center'>
         <Image source={menuImages[meal.image] ?? menuImages.bigBaik} className='w-32 h-32' resizeMode="contain" />
       </View>
@@ -23,6 +30,6 @@ export function MoreCard({ meal }: { meal: SideMeal }) {
         </View>
         <Text className="font-bold text-red-500 text-lg">{meal.price} {meal.currency}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }

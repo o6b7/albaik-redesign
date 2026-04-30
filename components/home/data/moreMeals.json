@@ -6,7 +6,8 @@
         "currency": "SAR",
         "image": "caleslaw",
         "rating": 4.2,
-        "reviews": 312
+        "reviews": 312,
+        "bgColor": "#FFFFFF"
     },
     {
         "id": 1,
@@ -15,7 +16,8 @@
         "currency": "SAR",
         "image": "cornCup",
         "rating": 3.5,
-        "reviews": 874
+        "reviews": 874,
+        "bgColor": "#FFFFFF"
     },
     {
         "id": 2,
@@ -24,7 +26,8 @@
         "currency": "SAR",
         "image": "icecream",
         "rating": 4.7,
-        "reviews": 1024
+        "reviews": 1024,
+        "bgColor": "#FFFFFF"
     },
     {
         "id": 3,
@@ -33,7 +36,8 @@
         "currency": "SAR",
         "image": "fries",
         "rating": 4.5,
-        "reviews": 763
+        "reviews": 763,
+        "bgColor": "#FFFFFF"
     },
     {
         "id": 4,
@@ -42,7 +46,8 @@
         "currency": "SAR",
         "image": "chips",
         "rating": 4.1,
-        "reviews": 445
+        "reviews": 445,
+        "bgColor": "#FFFFFF"
     },
     {
         "id": 5,
@@ -51,6 +56,7 @@
         "currency": "SAR",
         "image": "hummus",
         "rating": 4.8,
-        "reviews": 1232
+        "reviews": 1232,
+        "bgColor": "#FFFFFF"
     }
 ]
