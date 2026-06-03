@@ -1,18 +1,26 @@
-import { FlatList, Text, TouchableOpacity, View } from 'react-native';
-import categories from './data/categories.json';
+import { FlatList, TouchableOpacity, View, Text } from 'react-native';
+
+import { useCollection } from '@/hooks/useFirestore';
+import { CategoryTabsSkeleton } from './Skeleton';
 
 export function CategoryTabs({ activeCategory, setActiveCategory }: { activeCategory: string, setActiveCategory: (category: string) => void }) {
+  const { data: rawCategories, loading } = useCollection("categories");
+  const categories = [...rawCategories].sort((a: any, b: any) =>
+    a.category === 'all' ? -1 : b.category === 'all' ? 1 : 0
+  );
+
+  if (loading) return <CategoryTabsSkeleton />
 
   return (
     <View className="bg-gray-100 rounded-md mb-2">
       <FlatList
         horizontal
         data={categories}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item: any) => item.firestoreId.toString()}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 16 }}
 
-        renderItem={({ item }) => {
+        renderItem={({ item }: { item: any }) => {
           const isActive = activeCategory === item.category;
 
           return (

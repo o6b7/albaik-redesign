@@ -1,4 +1,3 @@
-import { menuImages } from '@/constants/images';
 import { CartItem, useCartStore } from '@/store/cart-store';
 import { Minus, Plus, Trash2 } from 'lucide-react-native';
 import { FlatList, Image, Pressable, Text, View } from 'react-native';
@@ -22,7 +21,7 @@ export default function CartScreen() {
   const renderItem = ({ item }: { item: CartItem }) => (
     <View className='flex-row items-center bg-gray-50 rounded-2xl p-3 mb-3'>
       <Image
-        source={menuImages[item.image]}
+        source={{ uri: item.image }}
         className='w-20 h-20'
         resizeMode='contain'
       />
@@ -66,7 +65,7 @@ export default function CartScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={['top', 'bottom']}>
-      <View className='px-5 pt-4 pb-4 pb-2 flex-row justify-between items-center'>
+      <View className='px-5 pt-4 pb-2 flex-row justify-between items-center'>
         <Text className='text-gray-900 font-bold text-2xl'>Cart</Text>
         <Pressable onPress={clearCart}>
           <Text className='text-[#C0392B] font-medium'>Clear all</Text>

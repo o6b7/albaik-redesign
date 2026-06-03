@@ -15,7 +15,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import '../global.css';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { menuImages } from '@/constants/images';
 import { useFlyingItemStore } from '@/store/flying-item-store';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -77,7 +76,7 @@ function FlyingItemOverlay() {
   return (
     <Animated.View style={[styles.flyingContainer, animatedStyle]} pointerEvents="none">
       <Animated.Image
-        source={menuImages[item.image] ?? menuImages.bigBaik}
+        source={{ uri: item.image }}
         style={styles.flyingImage}
         resizeMode="contain"
       />

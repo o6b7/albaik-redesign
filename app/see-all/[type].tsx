@@ -5,15 +5,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { MealCard } from '@/components/home/MealCard';
 import { MoreCard } from '@/components/home/MoreCard';
-import featuredMeals from '@/components/home/data/featuredMeals.json';
-import moreMeals from '@/components/home/data/moreMeals.json';
+import { useCollection } from '@/hooks/useFirestore';
 
 function MealsGrid() {
+  const { data: featuredMeals } = useCollection("meals");
   return (
     <FlatList
       data={featuredMeals}
-      keyExtractor={(item) => item.id.toString()}
-      renderItem={({ item }) => <MealCard meal={item} grid />}
+      keyExtractor={(item: any) => item.firestoreId.toString()}
+      renderItem={({ item }: { item: any }) => <MealCard meal={item} grid />}
       numColumns={2}
       columnWrapperStyle={{ gap: 12 }}
       contentContainerStyle={{ padding: 16, gap: 12, paddingBottom: 100 }}
@@ -23,11 +23,12 @@ function MealsGrid() {
 }
 
 function MoreGrid() {
+  const { data: moreMeals } = useCollection("more");
   return (
     <FlatList
       data={moreMeals}
-      keyExtractor={(item) => item.id.toString()}
-      renderItem={({ item }) => <MoreCard meal={item} grid />}
+      keyExtractor={(item: any) => item.firestoreId.toString()}
+      renderItem={({ item }: { item: any }) => <MoreCard meal={item} grid />}
       numColumns={2}
       columnWrapperStyle={{ gap: 12 }}
       contentContainerStyle={{ padding: 16, gap: 12, paddingBottom: 100 }}

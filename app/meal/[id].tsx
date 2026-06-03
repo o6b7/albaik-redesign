@@ -1,7 +1,4 @@
-import featuredMeals from '@/components/home/data/featuredMeals.json';
-import moreMeals from '@/components/home/data/moreMeals.json';
 import { Meal } from '@/components/home/types';
-import { menuImages } from '@/constants/images';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft, Check, Heart, Minus, Plus } from 'lucide-react-native';
 import { useState } from 'react';
@@ -10,6 +7,8 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useCartStore } from '@/store/cart-store';
 import { useFlyingItemStore } from '@/store/flying-item-store';
+
+import { useCollection } from '@/hooks/useFirestore';
 
 const TOPPINGS = [
   { id: 1, name: 'Add pickle', price: 'free' },
@@ -28,11 +27,21 @@ export default function MealDetailScreen() {
   const addItem = useCartStore((state) => state.addItem);
   const triggerFly = useFlyingItemStore((state) => state.trigger);
 
+  const { data: featuredMeals } = useCollection("meals");
+  const { data: moreMeals } = useCollection("more");
+
+  let meal: Meal | undefined;
+  if (type === 'featured') {
+    meal = featuredMeals.find((m: any) => m.firestoreId === id) as Meal | undefined;
+  } else {
+    meal = moreMeals.find((m: any) => m.firestoreId === id) as Meal | undefined;
+  }
+
   const handleAddToCart = () => {
     if (!meal) return;
     const selectedToppings = TOPPINGS.filter((t) => checkedToppings.has(t.id));
     addItem({
-      id: meal.id,
+      id: meal.firestoreId,
       name: meal.name,
       price: meal.price,
       currency: meal.currency,
@@ -49,13 +58,6 @@ export default function MealDetailScreen() {
     router.back();
   };
 
-  let meal: Meal | undefined;
-  if (type === 'featured') {
-    meal = featuredMeals.find((m) => m.id === Number(id)) as Meal | undefined;
-  } else {
-    meal = moreMeals.find((m) => m.id === Number(id)) as Meal | undefined;
-  }
-
   const toggleTopping = (toppingId: number) => {
     setCheckedToppings(prev => {
       const next = new Set(prev);
@@ -67,7 +69,7 @@ export default function MealDetailScreen() {
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
-<SafeAreaView className="flex-1 bg-white" edges={['bottom']}>
+      <SafeAreaView className="flex-1 bg-white" edges={['bottom']}>
         {/* Hero */}
         <View className="w-full" style={{ height: 280, backgroundColor: meal?.bgColor ?? '#8A151B' }}>
           <Pressable
@@ -82,7 +84,7 @@ export default function MealDetailScreen() {
             style={{ shadowColor: '#fff', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.9, shadowRadius: 30, overflow: 'visible' }}
           >
             <Image
-              source={meal?.image ? menuImages[meal.image] : menuImages.bigBaik}
+              source={{ uri: meal?.image }}
               className="w-full h-52"
               resizeMode="contain"
             />
@@ -91,7 +93,7 @@ export default function MealDetailScreen() {
 
         <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
           <View className="p-5">
-            <Text className="text-gray-400 text-sm mb-1">Chicken</Text>
+            <Text className="text-gray-400 text-sm mb-1">{meal?.category}</Text>
             <View className="flex-row justify-between items-center mb-3">
               <Text className="text-gray-900 font-bold text-3xl">{meal?.name}</Text>
               <Text className="text-gray-900 font-bold text-xl">${meal?.price} {meal?.currency}</Text>

@@ -3,7 +3,6 @@ import { Star } from 'lucide-react-native';
 import { useRef } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 
-import { menuImages } from '@/constants/images';
 import { SideMeal } from './types';
 
 export function MoreCard({ meal, grid }: { meal: SideMeal; grid?: boolean }) {
@@ -14,7 +13,7 @@ export function MoreCard({ meal, grid }: { meal: SideMeal; grid?: boolean }) {
     cardRef.current?.measureInWindow((x, y, width, height) => {
       const cx = Math.round(x + width / 2);
       const cy = Math.round(y + height / 2);
-      router.push(`/meal/${meal.id}?type=more&cardX=${cx}&cardY=${cy}`);
+      router.push(`/meal/${meal.firestoreId}?type=more&cardX=${cx}&cardY=${cy}`);
     });
   };
 
@@ -26,7 +25,7 @@ export function MoreCard({ meal, grid }: { meal: SideMeal; grid?: boolean }) {
       onPress={handlePress}
     >
       <View className='items-center'>
-        <Image source={menuImages[meal.image] ?? menuImages.bigBaik} className='w-32 h-32' resizeMode="contain" />
+        <Image source={{ uri: meal.image }} className='w-32 h-32' resizeMode="contain" />
       </View>
       <View className="flex-row justify-between items-end">
         <View className="gap-0.5">

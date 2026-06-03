@@ -1,4 +1,5 @@
 export interface Meal {
+  firestoreId: string;
   id: number;
   name: string;
   description?: string;
@@ -12,6 +13,7 @@ export interface Meal {
 }
 
 export interface SideMeal {
+  firestoreId: string;
   id: number;
   name: string;
   price: string;

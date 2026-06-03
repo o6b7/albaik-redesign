@@ -3,7 +3,6 @@ import { Heart, Star } from 'lucide-react-native';
 import { useRef, useState } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 
-import { menuImages } from '@/constants/images';
 import { Meal } from './types';
 
 export function MealCard({ meal, grid }: { meal: Meal; grid?: boolean }) {
@@ -15,7 +14,7 @@ export function MealCard({ meal, grid }: { meal: Meal; grid?: boolean }) {
     cardRef.current?.measureInWindow((x, y, width, height) => {
       const cx = Math.round(x + width / 2);
       const cy = Math.round(y + height / 2);
-      router.push(`/meal/${meal.id}?type=featured&cardX=${cx}&cardY=${cy}`);
+      router.push(`/meal/${meal.firestoreId}?type=featured&cardX=${cx}&cardY=${cy}`);
     });
   };
 
@@ -39,7 +38,7 @@ export function MealCard({ meal, grid }: { meal: Meal; grid?: boolean }) {
         <View className='items-center' style={{ overflow: 'visible' }}>
           <View style={{ shadowColor: '#fff', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.6, shadowRadius: 25, overflow: 'visible' }}>
             <Image
-              source={menuImages[meal.image] ?? menuImages.bigBaik}
+              source={{ uri: meal.image }}
               style={grid ? { width: 100, height: 100 } : { width: 140, height: 140, overflow: 'visible' }}
               resizeMode="contain"
             />
