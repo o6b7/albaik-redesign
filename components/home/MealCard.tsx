@@ -1,22 +1,31 @@
 import { useRouter } from 'expo-router';
 import { Heart, Star } from 'lucide-react-native';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 
 import { menuImages } from '@/constants/images';
 import { Meal } from './types';
 
-export function MealCard({ meal }: { meal: Meal }) {
+export function MealCard({ meal, grid }: { meal: Meal; grid?: boolean }) {
   const [isLiked, setIsLiked] = useState(false);
   const router = useRouter();
+  const cardRef = useRef<View>(null);
+
+  const handlePress = () => {
+    cardRef.current?.measureInWindow((x, y, width, height) => {
+      const cx = Math.round(x + width / 2);
+      const cy = Math.round(y + height / 2);
+      router.push(`/meal/${meal.id}?type=featured&cardX=${cx}&cardY=${cy}`);
+    });
+  };
 
   return (
     <TouchableOpacity
-      className="py-4 bg-gray-100 rounded-md items-center justify-center"
+      className={`py-4 bg-gray-100 rounded-md items-center justify-center ${grid ? 'flex-1' : ''}`}
       activeOpacity={0.9}
-      onPress={() => router.push(`/meal/${meal.id}?type=featured`)}
+      onPress={handlePress}
     >
-      <View style={{ backgroundColor: meal.bgColor ?? '#8A151B' }} className="rounded-3xl w-[210px] h-[260px] p-5 justify-between">
+      <View ref={cardRef} style={{ backgroundColor: meal.bgColor ?? '#8A151B' }} className={`rounded-3xl p-5 justify-between ${grid ? 'w-full h-[240px]' : 'w-[210px] h-[260px]'}`}>
         <View className='flex-row justify-between shrink'>
           <View className='flex-1 pr-2'>
             <Text className='font-bold text-lg text-white' numberOfLines={1}>{meal.name}</Text>

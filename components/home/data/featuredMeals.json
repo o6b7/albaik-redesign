@@ -8,7 +8,8 @@
         "image": "bigBaik",
         "rating": 4.5,
         "reviews": 54,
-        "bgColor": "#8A151B"
+        "bgColor": "#8A151B",
+        "category": "chicken"
     },
     {
         "id": 1,
@@ -19,7 +20,8 @@
         "image": "superBaik",
         "rating": 4.8,
         "reviews": 66,
-        "bgColor": "#ffbf2d"
+        "bgColor": "#ffbf2d",
+        "category": "chicken"
     },
     {
         "id": 2,
@@ -30,7 +32,8 @@
         "image": "crispyBaik",
         "rating": 4.4,
         "reviews": 77,
-        "bgColor": "#054D62"
+        "bgColor": "#054D62",
+        "category": "chicken"
     },
     {
         "id": 3,
@@ -41,7 +44,8 @@
         "image": "chickenFillet",
         "rating": 4.9,
         "reviews": 120,
-        "bgColor": "#8A151B"
+        "bgColor": "#8A151B",
+        "category": "chicken"
     },
     {
         "id": 4,
@@ -52,7 +56,8 @@
         "image": "superShrimp",
         "rating": 4.7,
         "reviews": 98,
-        "bgColor": "#FFBF2D"
+        "bgColor": "#FFBF2D",
+        "category": "seafood"
     },
     {
         "id": 5,
@@ -63,7 +68,8 @@
         "image": "eightPcsChicken",
         "rating": 4.6,
         "reviews": 211,
-        "bgColor": "#054D62"
+        "bgColor": "#054D62",
+        "category": "chicken"
     },
     {
         "id": 6,
@@ -74,7 +80,8 @@
         "image": "chickenNuggets",
         "rating": 4.3,
         "reviews": 183,
-        "bgColor": "#8A151B"
+        "bgColor": "#8A151B",
+        "category": "chicken"
     },
     {
         "id": 7,
@@ -85,7 +92,8 @@
         "image": "broastedShrimp",
         "rating": 4.9,
         "reviews": 542,
-        "bgColor": "#FFBF2D"
+        "bgColor": "#FFBF2D",
+        "category": "seafood"
     },
     {
         "id": 8,
@@ -96,7 +104,8 @@
         "image": "doubleBurger",
         "rating": 4.5,
         "reviews": 302,
-        "bgColor": "#8A151B"
+        "bgColor": "#8A151B",
+        "category": "chicken"
     },
     {
         "id": 9,
@@ -107,6 +116,7 @@
         "image": "fishFillet",
         "rating": 4.2,
         "reviews": 145,
-        "bgColor": "#054D62"
+        "bgColor": "#054D62",
+        "category": "seafood"
     }
 ]

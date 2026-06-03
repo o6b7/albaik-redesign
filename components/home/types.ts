@@ -8,6 +8,7 @@ export interface Meal {
   rating: number;
   reviews: number;
   bgColor?: string;
+  category: string;
 }
 
 export interface SideMeal {

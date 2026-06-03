@@ -1,9 +1,7 @@
-import { useState } from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 import categories from './data/categories.json';
 
-export function CategoryTabs() {
-  const [activeCategory, setActiveCategory] = useState('all');
+export function CategoryTabs({ activeCategory, setActiveCategory }: { activeCategory: string, setActiveCategory: (category: string) => void }) {
 
   return (
     <View className="bg-gray-100 rounded-md mb-2">

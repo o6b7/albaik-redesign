@@ -8,6 +8,9 @@ import { useState } from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useCartStore } from '@/store/cart-store';
+import { useFlyingItemStore } from '@/store/flying-item-store';
+
 const TOPPINGS = [
   { id: 1, name: 'Add pickle', price: 'free' },
   { id: 2, name: 'Add garlic', price: 'free' },
@@ -18,10 +21,33 @@ const TOPPINGS = [
 export default function MealDetailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { id, type } = useLocalSearchParams<{ id: string; type: string }>();
+  const { id, type, cardX, cardY } = useLocalSearchParams<{ id: string; type: string; cardX: string; cardY: string }>();
   const [checkedToppings, setCheckedToppings] = useState<Set<number>>(new Set([1]));
   const [quantity, setQuantity] = useState(1);
   const [liked, setLiked] = useState(false);
+  const addItem = useCartStore((state) => state.addItem);
+  const triggerFly = useFlyingItemStore((state) => state.trigger);
+
+  const handleAddToCart = () => {
+    if (!meal) return;
+    const selectedToppings = TOPPINGS.filter((t) => checkedToppings.has(t.id));
+    addItem({
+      id: meal.id,
+      name: meal.name,
+      price: meal.price,
+      currency: meal.currency,
+      image: meal.image,
+      quantity,
+      toppings: selectedToppings,
+    });
+
+    triggerFly({
+      image: meal.image,
+      startX: Number(cardX) || 0,
+      startY: Number(cardY) || 0,
+    });
+    router.back();
+  };
 
   let meal: Meal | undefined;
   if (type === 'featured') {
@@ -41,7 +67,7 @@ export default function MealDetailScreen() {
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
-      <SafeAreaView className="flex-1 bg-white" edges={['bottom']}>
+<SafeAreaView className="flex-1 bg-white" edges={['bottom']}>
         {/* Hero */}
         <View className="w-full" style={{ height: 280, backgroundColor: meal?.bgColor ?? '#8A151B' }}>
           <Pressable
@@ -117,7 +143,10 @@ export default function MealDetailScreen() {
             </View>
           </View>
           <View className="flex-row gap-3">
-            <Pressable className="flex-1 bg-[#C0392B] rounded-2xl py-4 items-center">
+            <Pressable
+              className="flex-1 bg-[#C0392B] rounded-2xl py-4 items-center"
+              onPress={handleAddToCart}
+            >
               <Text className="text-white font-bold text-base">Add to Cart</Text>
             </Pressable>
             <Pressable onPress={() => setLiked(l => !l)} className="w-14 h-14 bg-[#C0392B] rounded-2xl items-center justify-center">
