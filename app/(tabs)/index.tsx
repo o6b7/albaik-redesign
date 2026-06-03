@@ -7,13 +7,11 @@ import { Header } from '@/components/home/Header';
 import { MenuList } from '@/components/home/MenuList';
 import { MoreList } from '@/components/home/MoreList';
 import { SearchBar } from '@/components/home/SearchBar';
-import { SubHeader } from '@/components/SubHeader';
-
-import featuredMeals from '@/components/home/data/featuredMeals.json';
 import { useState } from 'react';
 
 export default function HomeScreen() {
   const [activeCategory, setActiveCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
 
   return (
@@ -23,11 +21,10 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Header />
-        <SearchBar />
+        <SearchBar onSearch={setSearchQuery} />
         <CategoryTabs activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
-        <MenuList meals={featuredMeals} activeCategory={activeCategory} onSeeAll={() => router.push('/see-all/meals')} />
-        <SubHeader title="More" onSeeAll={() => router.push('/see-all/more')} />
-        <MoreList />
+        <MenuList activeCategory={activeCategory} onSeeAll={() => router.push('/see-all/meals')} searchedQuery={searchQuery} />
+        <MoreList onSeeAll={() => router.push('/see-all/more')} />
       </ScrollView>
     </SafeAreaView>
   );

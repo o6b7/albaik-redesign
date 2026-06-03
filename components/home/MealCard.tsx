@@ -25,7 +25,7 @@ export function MealCard({ meal, grid }: { meal: Meal; grid?: boolean }) {
       activeOpacity={0.9}
       onPress={handlePress}
     >
-      <View ref={cardRef} style={{ backgroundColor: meal.bgColor ?? '#8A151B' }} className={`rounded-3xl p-5 justify-between ${grid ? 'w-full h-[240px]' : 'w-[210px] h-[260px]'}`}>
+      <View ref={cardRef} style={{ backgroundColor: meal.bgColor ?? '#8A151B' }} className={`rounded-3xl justify-between ${grid ? 'w-full h-[220px] p-4' : 'w-[210px] h-[260px] p-5'}`}>
         <View className='flex-row justify-between shrink'>
           <View className='flex-1 pr-2'>
             <Text className='font-bold text-lg text-white' numberOfLines={1}>{meal.name}</Text>
@@ -40,7 +40,7 @@ export function MealCard({ meal, grid }: { meal: Meal; grid?: boolean }) {
           <View style={{ shadowColor: '#fff', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.6, shadowRadius: 25, overflow: 'visible' }}>
             <Image
               source={menuImages[meal.image] ?? menuImages.bigBaik}
-              style={{ width: 140, height: 140, overflow: 'visible' }}
+              style={grid ? { width: 100, height: 100 } : { width: 140, height: 140, overflow: 'visible' }}
               resizeMode="contain"
             />
           </View>
