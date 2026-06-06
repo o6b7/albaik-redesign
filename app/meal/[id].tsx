@@ -27,15 +27,12 @@ export default function MealDetailScreen() {
   const addItem = useCartStore((state) => state.addItem);
   const triggerFly = useFlyingItemStore((state) => state.trigger);
 
-  const { data: featuredMeals } = useCollection("meals");
-  const { data: moreMeals } = useCollection("more");
+  const { data: featuredMeals } = useCollection<Meal>("meals");
+  const { data: moreMeals } = useCollection<Meal>("more");
 
-  let meal: Meal | undefined;
-  if (type === 'featured') {
-    meal = featuredMeals.find((m: any) => m.firestoreId === id) as Meal | undefined;
-  } else {
-    meal = moreMeals.find((m: any) => m.firestoreId === id) as Meal | undefined;
-  }
+  const meal = type === 'featured'
+    ? featuredMeals.find((m) => m.firestoreId === id)
+    : moreMeals.find((m) => m.firestoreId === id);
 
   const handleAddToCart = () => {
     if (!meal) return;
@@ -96,7 +93,7 @@ export default function MealDetailScreen() {
             <Text className="text-gray-400 text-sm mb-1">{meal?.category}</Text>
             <View className="flex-row justify-between items-center mb-3">
               <Text className="text-gray-900 font-bold text-3xl">{meal?.name}</Text>
-              <Text className="text-gray-900 font-bold text-xl">${meal?.price} {meal?.currency}</Text>
+              <Text className="text-gray-900 font-bold text-xl">{meal?.price} {meal?.currency}</Text>
             </View>
 
             {meal?.description && (

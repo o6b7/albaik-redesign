@@ -1,8 +1,8 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import { Dimensions, StyleSheet } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Dimensions, StyleSheet, View } from 'react-native';
 import Animated, {
   Easing,
   runOnJS,
@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import '../global.css';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useAuthStore } from '@/store/auth-store';
 import { useFlyingItemStore } from '@/store/flying-item-store';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -99,10 +100,40 @@ const styles = StyleSheet.create({
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const user = useAuthStore((state) => state.user);
+  const [ready, setReady] = useState(false);
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    // Wait for zustand to rehydrate from AsyncStorage
+    const unsub = useAuthStore.persist.onFinishHydration(() => setReady(true));
+    if (useAuthStore.persist.hasHydrated()) setReady(true);
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+    const inAuth = (segments[0] as string) === '(auth)';
+    if (!user && !inAuth) {
+      router.replace('/(auth)/login' as any);
+    } else if (user && inAuth) {
+      router.replace('/(tabs)' as any);
+    }
+  }, [user, ready, segments]);
+
+  if (!ready) {
+    return (
+      <View className="flex-1 items-center justify-center bg-white">
+        <ActivityIndicator size="large" color="#C0392B" />
+      </View>
+    );
+  }
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="see-all/[type]" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />

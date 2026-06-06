@@ -7,7 +7,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-function SkeletonBox({ width, height, rounded = 12 }: { width: number | string; height: number; rounded?: number }) {
+function SkeletonBox({ width, height, rounded = 12 }: { width: number | `${number}%`; height: number; rounded?: number }) {
   const opacity = useSharedValue(0.3);
 
   useEffect(() => {
@@ -20,7 +20,7 @@ function SkeletonBox({ width, height, rounded = 12 }: { width: number | string; 
     <Animated.View
       style={[
         {
-          width: width as any,
+          width,
           height,
           borderRadius: rounded,
           backgroundColor: '#D1D5DB',
