@@ -1,23 +1,24 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useColorScheme } from 'react-native';
 
 import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Home, ShoppingCart, User, Settings } from 'lucide-react-native';
 
 export default function TabLayout() {
-  const insets = useSafeAreaInsets();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: '#EF4444',
-        tabBarInactiveTintColor: '#A3A3A3',
+        tabBarInactiveTintColor: isDark ? '#666' : '#A3A3A3',
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarShowLabel: false,
         tabBarStyle: {
-          backgroundColor: '#FFFFFF',
+          backgroundColor: isDark ? '#1a1a1a' : '#FFFFFF',
           borderTopWidth: 0,
           elevation: 10,
           shadowColor: '#000000',
@@ -31,28 +32,28 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarIcon: ({ color }) => <Home size={28} color={color} />,
         }}
       />
       <Tabs.Screen
         name="cart"
         options={{
           title: 'Cart',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="cart.fill" color={color} />,
+          tabBarIcon: ({ color }) => <ShoppingCart size={28} color={color} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+          tabBarIcon: ({ color }) => <User size={28} color={color} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
           title: 'Settings',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="gearshape.fill" color={color} />,
+          tabBarIcon: ({ color }) => <Settings size={28} color={color} />,
         }}
       />
     </Tabs>

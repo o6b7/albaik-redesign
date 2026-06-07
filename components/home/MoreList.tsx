@@ -1,9 +1,28 @@
-import { View, Text } from 'react-native';
+import { FlatList } from 'react-native';
 
-export function MoreList() {
+import { SubHeader } from '../SubHeader';
+import { MoreCard } from './MoreCard';
+
+import { useCollection } from '@/hooks/useFirestore';
+import { MoreCardSkeleton } from './Skeleton';
+import { SideMeal } from './types';
+
+export function MoreList({ onSeeAll }: { onSeeAll?: () => void }) {
+  const { data: moreMeals, loading } = useCollection<SideMeal>("more");
+
+  if (loading) return <><SubHeader title="More" /><MoreCardSkeleton /></>
+
   return (
-    <View className="py-12 bg-gray-100 rounded-md mb-2 items-center justify-center">
-      <Text className="text-gray-500">MoreList (More Section, smaller cards horizontally scrollable)</Text>
-    </View>
+    <>
+      <SubHeader title="More" onSeeAll={onSeeAll} />
+      <FlatList
+        data={moreMeals}
+        keyExtractor={(item) => item.firestoreId}
+        renderItem={({ item }) => <MoreCard meal={item} />}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ gap: 20, paddingHorizontal: 16, paddingVertical: 16 }}
+      />
+    </>
   );
 }

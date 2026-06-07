@@ -1,25 +1,30 @@
-import { ScrollView, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Header } from '@/components/home/Header';
-import { SearchBar } from '@/components/home/SearchBar';
 import { CategoryTabs } from '@/components/home/CategoryTabs';
-import { FeaturedList } from '@/components/home/FeaturedList';
+import { Header } from '@/components/home/Header';
+import { MenuList } from '@/components/home/MenuList';
 import { MoreList } from '@/components/home/MoreList';
+import { SearchBar } from '@/components/home/SearchBar';
+import { useState } from 'react';
 
 export default function HomeScreen() {
-  // We use ScrollView so the content is scrollable when it overflows the screen height
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const router = useRouter();
+
   return (
-    <SafeAreaView className="flex-1 bg-[#F5F5F5]" edges={['top']}>
-      <ScrollView 
-        contentContainerStyle={{ padding: 16, paddingBottom: 100 }} 
+    <SafeAreaView className="flex-1 bg-[#F5F5F5] dark:bg-[#121212]" edges={['top']}>
+      <ScrollView
+        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
       >
         <Header />
-        <SearchBar />
-        <CategoryTabs />
-        <FeaturedList />
-        <MoreList />
+        <SearchBar onSearch={setSearchQuery} />
+        <CategoryTabs activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
+        <MenuList activeCategory={activeCategory} onSeeAll={() => router.push('/see-all/meals')} searchedQuery={searchQuery} />
+        <MoreList onSeeAll={() => router.push('/see-all/more')} />
       </ScrollView>
     </SafeAreaView>
   );
