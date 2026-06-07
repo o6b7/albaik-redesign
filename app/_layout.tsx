@@ -137,6 +137,8 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="profile" options={{ headerShown: false }} />
         <Stack.Screen name="see-all/[type]" options={{ headerShown: false }} />
+        <Stack.Screen name="order/[id]" options={{ headerShown: false }} />
+        <Stack.Screen name="order/history" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>
       <FlyingItemOverlay />

@@ -5,7 +5,7 @@ import {
   collection,
   deleteDoc,
   doc,
-  getDocs,
+  onSnapshot,
   updateDoc,
 } from 'firebase/firestore';
 import { useCallback, useEffect, useState } from 'react';
@@ -22,54 +22,53 @@ export function useUserCollection<T extends { id: string }>(
     return collection(db, 'users', user.uid, subcollection);
   }, [user, subcollection]);
 
-  const fetch = useCallback(async () => {
-    const colRef = getColRef();
-    if (!colRef) return;
-    setLoading(true);
-    try {
-      const snapshot = await getDocs(colRef);
-      const items = snapshot.docs.map((d) => ({
-        id: d.id,
-        ...d.data(),
-      })) as T[];
-      setData(items);
-    } catch (error) {
-      console.error(`Error fetching ${subcollection}:`, error);
-    } finally {
-      setLoading(false);
-    }
-  }, [getColRef, subcollection]);
-
   useEffect(() => {
-    fetch();
-  }, [fetch]);
+    const colRef = getColRef();
+    if (!colRef) {
+      setLoading(false);
+      return;
+    }
+    const unsubscribe = onSnapshot(
+      colRef,
+      (snapshot) => {
+        const items = snapshot.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
+        })) as T[];
+        setData(items);
+        setLoading(false);
+      },
+      (error) => {
+        console.error(`Error listening to ${subcollection}:`, error);
+        setLoading(false);
+      }
+    );
+    return () => unsubscribe();
+  }, [getColRef, subcollection]);
 
   const add = useCallback(
     async (item: Omit<T, 'id'>) => {
       const colRef = getColRef();
       if (!colRef) return;
       await addDoc(colRef, item);
-      await fetch();
     },
-    [getColRef, fetch]
+    [getColRef]
   );
 
   const update = useCallback(
     async (id: string, updates: Partial<Omit<T, 'id'>>) => {
       if (!user) return;
       await updateDoc(doc(db, 'users', user.uid, subcollection, id), updates);
-      await fetch();
     },
-    [user, subcollection, fetch]
+    [user, subcollection]
   );
 
   const remove = useCallback(
     async (id: string) => {
       if (!user) return;
       await deleteDoc(doc(db, 'users', user.uid, subcollection, id));
-      await fetch();
     },
-    [user, subcollection, fetch]
+    [user, subcollection]
   );
 
   const clearDefault = useCallback(
@@ -84,5 +83,7 @@ export function useUserCollection<T extends { id: string }>(
     [data, user, subcollection]
   );
 
-  return { data, loading, add, update, remove, refresh: fetch, clearDefault };
+  const refresh = useCallback(() => {}, []);
+
+  return { data, loading, add, update, remove, refresh, clearDefault };
 }
