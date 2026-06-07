@@ -1,17 +1,28 @@
 import { FlatList } from 'react-native';
 
-import moreMeals from './data/moreMeals.json';
+import { SubHeader } from '../SubHeader';
 import { MoreCard } from './MoreCard';
 
-export function MoreList() {
+import { useCollection } from '@/hooks/useFirestore';
+import { MoreCardSkeleton } from './Skeleton';
+import { SideMeal } from './types';
+
+export function MoreList({ onSeeAll }: { onSeeAll?: () => void }) {
+  const { data: moreMeals, loading } = useCollection<SideMeal>("more");
+
+  if (loading) return <><SubHeader title="More" /><MoreCardSkeleton /></>
+
   return (
-    <FlatList
-      data={moreMeals}
-      keyExtractor={(item) => item.id.toString()}
-      renderItem={({ item }) => <MoreCard meal={item} />}
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={{ gap: 20, paddingHorizontal: 16, paddingVertical: 16 }}
-    />
+    <>
+      <SubHeader title="More" onSeeAll={onSeeAll} />
+      <FlatList
+        data={moreMeals}
+        keyExtractor={(item) => item.firestoreId}
+        renderItem={({ item }) => <MoreCard meal={item} />}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ gap: 20, paddingHorizontal: 16, paddingVertical: 16 }}
+      />
+    </>
   );
 }

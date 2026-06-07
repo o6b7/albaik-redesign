@@ -1,16 +1,28 @@
-import { useState } from 'react';
-import { FlatList, Text, TouchableOpacity, View } from 'react-native';
-import categories from './data/categories.json';
+import { FlatList, TouchableOpacity, View, Text } from 'react-native';
 
-export function CategoryTabs() {
-  const [activeCategory, setActiveCategory] = useState('all');
+import { useCollection } from '@/hooks/useFirestore';
+import { CategoryTabsSkeleton } from './Skeleton';
+
+interface Category {
+  firestoreId: string;
+  id: number;
+  category: string;
+}
+
+export function CategoryTabs({ activeCategory, setActiveCategory }: { activeCategory: string, setActiveCategory: (category: string) => void }) {
+  const { data: rawCategories, loading } = useCollection<Category>("categories");
+  const categories = [...rawCategories].sort((a, b) =>
+    a.category === 'all' ? -1 : b.category === 'all' ? 1 : 0
+  );
+
+  if (loading) return <CategoryTabsSkeleton />
 
   return (
     <View className="bg-gray-100 rounded-md mb-2">
       <FlatList
         horizontal
         data={categories}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.firestoreId}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 16 }}
 

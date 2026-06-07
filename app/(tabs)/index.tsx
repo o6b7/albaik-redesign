@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -6,12 +7,13 @@ import { Header } from '@/components/home/Header';
 import { MenuList } from '@/components/home/MenuList';
 import { MoreList } from '@/components/home/MoreList';
 import { SearchBar } from '@/components/home/SearchBar';
-import { SubHeader } from '@/components/SubHeader';
-
-import featuredMeals from '@/components/home/data/featuredMeals.json';
+import { useState } from 'react';
 
 export default function HomeScreen() {
-  // We use ScrollView so the content is scrollable when it overflows the screen height
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const router = useRouter();
+
   return (
     <SafeAreaView className="flex-1 bg-[#F5F5F5]" edges={['top']}>
       <ScrollView
@@ -19,11 +21,10 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Header />
-        <SearchBar />
-        <CategoryTabs />
-        <MenuList meals={featuredMeals} />
-        <SubHeader title="More" />
-        <MoreList />
+        <SearchBar onSearch={setSearchQuery} />
+        <CategoryTabs activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
+        <MenuList activeCategory={activeCategory} onSeeAll={() => router.push('/see-all/meals')} searchedQuery={searchQuery} />
+        <MoreList onSeeAll={() => router.push('/see-all/more')} />
       </ScrollView>
     </SafeAreaView>
   );

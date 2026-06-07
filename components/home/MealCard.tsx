@@ -1,16 +1,30 @@
+import { useRouter } from 'expo-router';
 import { Heart, Star } from 'lucide-react-native';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 
-import { menuImages } from '@/constants/images';
 import { Meal } from './types';
 
-export function MealCard({ meal }: { meal: Meal }) {
+export function MealCard({ meal, grid }: { meal: Meal; grid?: boolean }) {
   const [isLiked, setIsLiked] = useState(false);
+  const router = useRouter();
+  const cardRef = useRef<View>(null);
+
+  const handlePress = () => {
+    cardRef.current?.measureInWindow((x, y, width, height) => {
+      const cx = Math.round(x + width / 2);
+      const cy = Math.round(y + height / 2);
+      router.push(`/meal/${meal.firestoreId}?type=featured&cardX=${cx}&cardY=${cy}`);
+    });
+  };
 
   return (
-    <View className="py-4 bg-gray-100 rounded-md items-center justify-center">
-      <View className='bg-red-500 rounded-3xl w-[210px] h-[260px] p-5 justify-between'>
+    <TouchableOpacity
+      className={`py-4 bg-gray-100 rounded-md items-center justify-center ${grid ? 'flex-1' : ''}`}
+      activeOpacity={0.9}
+      onPress={handlePress}
+    >
+      <View ref={cardRef} style={{ backgroundColor: meal.bgColor ?? '#8A151B' }} className={`rounded-3xl justify-between ${grid ? 'w-full h-[220px] p-4' : 'w-[210px] h-[260px] p-5'}`}>
         <View className='flex-row justify-between shrink'>
           <View className='flex-1 pr-2'>
             <Text className='font-bold text-lg text-white' numberOfLines={1}>{meal.name}</Text>
@@ -24,8 +38,8 @@ export function MealCard({ meal }: { meal: Meal }) {
         <View className='items-center' style={{ overflow: 'visible' }}>
           <View style={{ shadowColor: '#fff', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.6, shadowRadius: 25, overflow: 'visible' }}>
             <Image
-              source={menuImages[meal.image] ?? menuImages.bigBaik}
-              style={{ width: 140, height: 140, overflow: 'visible' }}
+              source={{ uri: meal.image }}
+              style={grid ? { width: 100, height: 100 } : { width: 140, height: 140, overflow: 'visible' }}
               resizeMode="contain"
             />
           </View>
@@ -46,6 +60,6 @@ export function MealCard({ meal }: { meal: Meal }) {
           </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
