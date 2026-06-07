@@ -28,6 +28,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useColorScheme,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -40,6 +41,7 @@ interface AccountData {
 export default function AccountInformationScreen() {
   const user = useAuthStore((state) => state.user);
   const setUser = useAuthStore((state) => state.setUser);
+  const isDark = useColorScheme() === 'dark';
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -168,7 +170,7 @@ export default function AccountInformationScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 bg-[#FAFAFA]">
+      <SafeAreaView className="flex-1 bg-[#FAFAFA] dark:bg-[#121212]">
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#C0392B" />
         </View>
@@ -177,7 +179,7 @@ export default function AccountInformationScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-[#FAFAFA]">
+    <SafeAreaView className="flex-1 bg-[#FAFAFA] dark:bg-[#121212]">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1"
@@ -186,7 +188,7 @@ export default function AccountInformationScreen() {
         <View className="flex-row items-center justify-between px-5 py-4">
           <TouchableOpacity
             onPress={() => router.back()}
-            className="w-10 h-10 rounded-full bg-white items-center justify-center"
+            className="w-10 h-10 rounded-full bg-white dark:bg-[#2A2A2A] items-center justify-center"
             style={{
               shadowColor: '#000',
               shadowOffset: { width: 0, height: 2 },
@@ -195,15 +197,15 @@ export default function AccountInformationScreen() {
               elevation: 3,
             }}
           >
-            <ArrowLeft size={20} color="#333" />
+            <ArrowLeft size={20} color={isDark ? '#ccc' : '#333'} />
           </TouchableOpacity>
-          <Text className="text-lg font-bold text-[#1a1a1a]">
+          <Text className="text-lg font-bold text-[#1a1a1a] dark:text-white">
             Account Information
           </Text>
           {!editing ? (
             <TouchableOpacity
               onPress={() => setEditing(true)}
-              className="w-10 h-10 rounded-full bg-white items-center justify-center"
+              className="w-10 h-10 rounded-full bg-white dark:bg-[#2A2A2A] items-center justify-center"
               style={{
                 shadowColor: '#000',
                 shadowOffset: { width: 0, height: 2 },
@@ -245,9 +247,10 @@ export default function AccountInformationScreen() {
               value={form.fullName}
               onChangeText={(text) => setForm({ ...form, fullName: text })}
               editable={editing}
-              icon={<User size={18} color={editing ? '#C0392B' : '#999'} />}
-              iconBg={editing ? '#FFF0EE' : '#F0F0F0'}
+              icon={<User size={18} color={editing ? '#C0392B' : (isDark ? '#777' : '#999')} />}
+              iconBg={editing ? (isDark ? '#3A1A1A' : '#FFF0EE') : (isDark ? '#333' : '#F0F0F0')}
               placeholder="Enter your full name"
+              isDark={isDark}
             />
 
             <View>
@@ -256,12 +259,13 @@ export default function AccountInformationScreen() {
                 value={form.email}
                 onChangeText={() => {}}
                 editable={false}
-                icon={<Mail size={18} color="#999" />}
-                iconBg="#F0F0F0"
+                icon={<Mail size={18} color={isDark ? '#777' : '#999'} />}
+                iconBg={isDark ? '#333' : '#F0F0F0'}
                 placeholder="Email address"
                 dimmed
+                isDark={isDark}
               />
-              <Text className="text-xs text-[#bbb] mt-1 ml-1">
+              <Text className="text-xs text-[#bbb] dark:text-[#666] mt-1 ml-1">
                 Email cannot be changed
               </Text>
             </View>
@@ -271,10 +275,11 @@ export default function AccountInformationScreen() {
               value={form.phone}
               onChangeText={(text) => setForm({ ...form, phone: text })}
               editable={editing}
-              icon={<Phone size={18} color={editing ? '#C0392B' : '#999'} />}
-              iconBg={editing ? '#FFF0EE' : '#F0F0F0'}
+              icon={<Phone size={18} color={editing ? '#C0392B' : (isDark ? '#777' : '#999')} />}
+              iconBg={editing ? (isDark ? '#3A1A1A' : '#FFF0EE') : (isDark ? '#333' : '#F0F0F0')}
               placeholder="Enter your phone number"
               keyboardType="phone-pad"
+              isDark={isDark}
             />
           </View>
 
@@ -286,7 +291,7 @@ export default function AccountInformationScreen() {
                 disabled={saving || !hasChanges}
                 className="flex-row items-center justify-center py-4 rounded-2xl"
                 style={{
-                  backgroundColor: saving || !hasChanges ? '#E0E0E0' : '#C0392B',
+                  backgroundColor: saving || !hasChanges ? (isDark ? '#333' : '#E0E0E0') : '#C0392B',
                   shadowColor: '#C0392B',
                   shadowOffset: { width: 0, height: 4 },
                   shadowOpacity: saving || !hasChanges ? 0 : 0.3,
@@ -307,7 +312,7 @@ export default function AccountInformationScreen() {
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleCancel}
-                className="items-center py-4 rounded-2xl bg-white"
+                className="items-center py-4 rounded-2xl bg-white dark:bg-[#2A2A2A]"
                 style={{
                   shadowColor: '#000',
                   shadowOffset: { width: 0, height: 1 },
@@ -316,7 +321,7 @@ export default function AccountInformationScreen() {
                   elevation: 2,
                 }}
               >
-                <Text className="text-[#999] text-base font-semibold">Cancel</Text>
+                <Text className="text-[#999] dark:text-[#777] text-base font-semibold">Cancel</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -325,7 +330,7 @@ export default function AccountInformationScreen() {
           <View className="mt-8 mb-10">
             <TouchableOpacity
               onPress={() => setShowPasswordSection(!showPasswordSection)}
-              className="flex-row items-center bg-white rounded-2xl px-4 py-4"
+              className="flex-row items-center bg-white dark:bg-[#2A2A2A] rounded-2xl px-4 py-4"
               style={{
                 shadowColor: '#000',
                 shadowOffset: { width: 0, height: 1 },
@@ -334,10 +339,10 @@ export default function AccountInformationScreen() {
                 elevation: 2,
               }}
             >
-              <View className="w-10 h-10 rounded-xl bg-[#FFF0EE] items-center justify-center mr-3">
+              <View className="w-10 h-10 rounded-xl bg-[#FFF0EE] dark:bg-[#3A1A1A] items-center justify-center mr-3">
                 <Lock size={18} color="#C0392B" />
               </View>
-              <Text className="flex-1 text-base font-semibold text-[#333]">
+              <Text className="flex-1 text-base font-semibold text-[#333] dark:text-[#E0E0E0]">
                 Change Password
               </Text>
               <ArrowLeft
@@ -358,6 +363,7 @@ export default function AccountInformationScreen() {
                   placeholder="Enter current password"
                   showPassword={showCurrentPw}
                   toggleShow={() => setShowCurrentPw(!showCurrentPw)}
+                  isDark={isDark}
                 />
                 <PasswordField
                   label="New Password"
@@ -366,13 +372,14 @@ export default function AccountInformationScreen() {
                   placeholder="Enter new password"
                   showPassword={showNewPw}
                   toggleShow={() => setShowNewPw(!showNewPw)}
+                  isDark={isDark}
                 />
                 <View>
-                  <Text className="text-xs font-semibold text-[#999] uppercase tracking-wider mb-2 ml-1">
+                  <Text className="text-xs font-semibold text-[#999] dark:text-[#777] uppercase tracking-wider mb-2 ml-1">
                     Confirm New Password
                   </Text>
                   <View
-                    className="flex-row items-center bg-white rounded-2xl px-4 py-4"
+                    className="flex-row items-center bg-white dark:bg-[#2A2A2A] rounded-2xl px-4 py-4"
                     style={{
                       shadowColor: '#000',
                       shadowOffset: { width: 0, height: 1 },
@@ -382,11 +389,11 @@ export default function AccountInformationScreen() {
                     }}
                   >
                     <TextInput
-                      className="flex-1 text-base text-[#333] font-medium"
+                      className="flex-1 text-base text-[#333] dark:text-[#E0E0E0] font-medium"
                       value={confirmPassword}
                       onChangeText={setConfirmPassword}
                       placeholder="Confirm new password"
-                      placeholderTextColor="#ccc"
+                      placeholderTextColor={isDark ? '#555' : '#ccc'}
                       secureTextEntry
                     />
                   </View>
@@ -399,7 +406,7 @@ export default function AccountInformationScreen() {
                   style={{
                     backgroundColor:
                       changingPassword || !currentPassword || !newPassword
-                        ? '#E0E0E0'
+                        ? (isDark ? '#333' : '#E0E0E0')
                         : '#C0392B',
                   }}
                 >
@@ -433,6 +440,7 @@ function InputField({
   placeholder,
   keyboardType,
   dimmed,
+  isDark,
 }: {
   label: string;
   value: string;
@@ -443,14 +451,15 @@ function InputField({
   placeholder: string;
   keyboardType?: 'default' | 'phone-pad';
   dimmed?: boolean;
+  isDark?: boolean;
 }) {
   return (
     <View>
-      <Text className="text-xs font-semibold text-[#999] uppercase tracking-wider mb-2 ml-1">
+      <Text className="text-xs font-semibold text-[#999] dark:text-[#777] uppercase tracking-wider mb-2 ml-1">
         {label}
       </Text>
       <View
-        className="flex-row items-center bg-white rounded-2xl px-4 py-4"
+        className="flex-row items-center bg-white dark:bg-[#2A2A2A] rounded-2xl px-4 py-4"
         style={{
           opacity: dimmed ? 0.6 : 1,
           shadowColor: '#000',
@@ -468,12 +477,12 @@ function InputField({
         </View>
         <TextInput
           className="flex-1 text-base font-medium"
-          style={{ color: dimmed ? '#999' : '#333' }}
+          style={{ color: dimmed ? (isDark ? '#666' : '#999') : (isDark ? '#E0E0E0' : '#333') }}
           value={value}
           onChangeText={onChangeText}
           editable={editable}
           placeholder={placeholder}
-          placeholderTextColor="#ccc"
+          placeholderTextColor={isDark ? '#555' : '#ccc'}
           keyboardType={keyboardType || 'default'}
         />
       </View>
@@ -488,6 +497,7 @@ function PasswordField({
   placeholder,
   showPassword,
   toggleShow,
+  isDark,
 }: {
   label: string;
   value: string;
@@ -495,14 +505,15 @@ function PasswordField({
   placeholder: string;
   showPassword: boolean;
   toggleShow: () => void;
+  isDark?: boolean;
 }) {
   return (
     <View>
-      <Text className="text-xs font-semibold text-[#999] uppercase tracking-wider mb-2 ml-1">
+      <Text className="text-xs font-semibold text-[#999] dark:text-[#777] uppercase tracking-wider mb-2 ml-1">
         {label}
       </Text>
       <View
-        className="flex-row items-center bg-white rounded-2xl px-4 py-4"
+        className="flex-row items-center bg-white dark:bg-[#2A2A2A] rounded-2xl px-4 py-4"
         style={{
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 1 },
@@ -512,11 +523,11 @@ function PasswordField({
         }}
       >
         <TextInput
-          className="flex-1 text-base text-[#333] font-medium"
+          className="flex-1 text-base text-[#333] dark:text-[#E0E0E0] font-medium"
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor="#ccc"
+          placeholderTextColor={isDark ? '#555' : '#ccc'}
           secureTextEntry={!showPassword}
         />
         <TouchableOpacity onPress={toggleShow}>

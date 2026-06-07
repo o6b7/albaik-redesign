@@ -145,7 +145,7 @@ export default function PaymentMethodsScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 bg-[#FAFAFA]">
+      <SafeAreaView className="flex-1 bg-[#FAFAFA] dark:bg-[#121212]">
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#C0392B" />
         </View>
@@ -154,12 +154,12 @@ export default function PaymentMethodsScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-[#FAFAFA]">
+    <SafeAreaView className="flex-1 bg-[#FAFAFA] dark:bg-[#121212]">
       {/* Header */}
       <View className="flex-row items-center justify-between px-5 py-4">
         <TouchableOpacity
           onPress={() => router.back()}
-          className="w-10 h-10 rounded-full bg-white items-center justify-center"
+          className="w-10 h-10 rounded-full bg-white dark:bg-[#2A2A2A] items-center justify-center"
           style={{
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 2 },
@@ -170,7 +170,7 @@ export default function PaymentMethodsScreen() {
         >
           <ArrowLeft size={20} color="#333" />
         </TouchableOpacity>
-        <Text className="text-lg font-bold text-[#1a1a1a]">Payment Methods</Text>
+        <Text className="text-lg font-bold text-[#1a1a1a] dark:text-white">Payment Methods</Text>
         <TouchableOpacity
           onPress={openAdd}
           className="w-10 h-10 rounded-full bg-[#C0392B] items-center justify-center"
@@ -196,8 +196,8 @@ export default function PaymentMethodsScreen() {
             <View className="w-20 h-20 rounded-full bg-[#FFF0EE] items-center justify-center mb-4">
               <CreditCard size={36} color="#C0392B" />
             </View>
-            <Text className="text-lg font-bold text-[#333] mb-1">No payment methods</Text>
-            <Text className="text-sm text-[#999] text-center px-10">
+            <Text className="text-lg font-bold text-[#333] dark:text-white mb-1">No payment methods</Text>
+            <Text className="text-sm text-[#999] dark:text-[#777] text-center px-10">
               Add a payment method for faster checkout.
             </Text>
             <TouchableOpacity
@@ -277,7 +277,7 @@ export default function PaymentMethodsScreen() {
                   <View className="flex-row justify-end gap-2 mt-2 px-1">
                     <TouchableOpacity
                       onPress={() => openEdit(method)}
-                      className="flex-row items-center bg-white px-4 py-2 rounded-full"
+                      className="flex-row items-center bg-white dark:bg-[#2A2A2A] px-4 py-2 rounded-full"
                       style={{
                         shadowColor: '#000',
                         shadowOffset: { width: 0, height: 1 },
@@ -313,16 +313,16 @@ export default function PaymentMethodsScreen() {
         presentationStyle="pageSheet"
         onRequestClose={() => setModalVisible(false)}
       >
-        <SafeAreaView className="flex-1 bg-[#FAFAFA]">
+        <SafeAreaView className="flex-1 bg-[#FAFAFA] dark:bg-[#121212]">
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             className="flex-1"
           >
-            <View className="flex-row items-center justify-between px-5 py-4 border-b border-[#F0F0F0]">
+            <View className="flex-row items-center justify-between px-5 py-4 border-b border-[#F0F0F0] dark:border-[#3A3A3A]">
               <TouchableOpacity onPress={() => setModalVisible(false)}>
                 <X size={24} color="#333" />
               </TouchableOpacity>
-              <Text className="text-lg font-bold text-[#1a1a1a]">
+              <Text className="text-lg font-bold text-[#1a1a1a] dark:text-white">
                 {editingId ? 'Edit Card' : 'New Card'}
               </Text>
               <View className="w-6" />
@@ -423,7 +423,7 @@ export default function PaymentMethodsScreen() {
                 >
                   {form.isDefault && <Check size={14} color="#fff" />}
                 </View>
-                <Text className="text-sm font-medium text-[#555]">
+                <Text className="text-sm font-medium text-[#555] dark:text-[#999]">
                   Set as default payment method
                 </Text>
               </TouchableOpacity>
@@ -478,11 +478,11 @@ function Field({
 }) {
   return (
     <View>
-      <Text className="text-xs font-semibold text-[#999] uppercase tracking-wider mb-2 ml-1">
+      <Text className="text-xs font-semibold text-[#999] dark:text-[#777] uppercase tracking-wider mb-2 ml-1">
         {label}
       </Text>
       <View
-        className="bg-white rounded-2xl px-4 py-4"
+        className="bg-white dark:bg-[#2A2A2A] rounded-2xl px-4 py-4"
         style={{
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 1 },
@@ -492,7 +492,7 @@ function Field({
         }}
       >
         <TextInput
-          className="text-base text-[#333] font-medium"
+          className="text-base text-[#333] dark:text-[#E0E0E0] font-medium"
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}

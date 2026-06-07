@@ -33,7 +33,7 @@ function SkeletonBox({ width, height, rounded = 12 }: { width: number | `${numbe
 
 export function CategoryTabsSkeleton() {
   return (
-    <View className="bg-gray-100 rounded-md mb-2 flex-row px-4 py-2 gap-2">
+    <View className="bg-gray-100 dark:bg-[#1E1E1E] rounded-md mb-2 flex-row px-4 py-2 gap-2">
       {[80, 90, 70, 80, 70, 90].map((w, i) => (
         <SkeletonBox key={i} width={w} height={32} rounded={16} />
       ))}

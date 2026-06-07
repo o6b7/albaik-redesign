@@ -124,7 +124,7 @@ export default function DeliveryAddressesScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 bg-[#FAFAFA]">
+      <SafeAreaView className="flex-1 bg-[#FAFAFA] dark:bg-[#121212]">
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#C0392B" />
         </View>
@@ -133,12 +133,12 @@ export default function DeliveryAddressesScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-[#FAFAFA]">
+    <SafeAreaView className="flex-1 bg-[#FAFAFA] dark:bg-[#121212]">
       {/* Header */}
       <View className="flex-row items-center justify-between px-5 py-4">
         <TouchableOpacity
           onPress={() => router.back()}
-          className="w-10 h-10 rounded-full bg-white items-center justify-center"
+          className="w-10 h-10 rounded-full bg-white dark:bg-[#2A2A2A] items-center justify-center"
           style={{
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 2 },
@@ -149,7 +149,7 @@ export default function DeliveryAddressesScreen() {
         >
           <ArrowLeft size={20} color="#333" />
         </TouchableOpacity>
-        <Text className="text-lg font-bold text-[#1a1a1a]">
+        <Text className="text-lg font-bold text-[#1a1a1a] dark:text-white">
           Delivery Addresses
         </Text>
         <TouchableOpacity
@@ -177,10 +177,10 @@ export default function DeliveryAddressesScreen() {
             <View className="w-20 h-20 rounded-full bg-[#FFF0EE] items-center justify-center mb-4">
               <MapPin size={36} color="#C0392B" />
             </View>
-            <Text className="text-lg font-bold text-[#333] mb-1">
+            <Text className="text-lg font-bold text-[#333] dark:text-white mb-1">
               No addresses yet
             </Text>
-            <Text className="text-sm text-[#999] text-center px-10">
+            <Text className="text-sm text-[#999] dark:text-[#777] text-center px-10">
               Add your delivery address to get your orders delivered quickly.
             </Text>
             <TouchableOpacity
@@ -206,7 +206,7 @@ export default function DeliveryAddressesScreen() {
               return (
                 <View
                   key={addr.id}
-                  className="bg-white rounded-2xl p-4"
+                  className="bg-white dark:bg-[#2A2A2A] rounded-2xl p-4"
                   style={{
                     shadowColor: '#000',
                     shadowOffset: { width: 0, height: 2 },
@@ -225,7 +225,7 @@ export default function DeliveryAddressesScreen() {
                       </View>
                       <View className="flex-1">
                         <View className="flex-row items-center gap-2">
-                          <Text className="text-base font-bold text-[#333]">
+                          <Text className="text-base font-bold text-[#333] dark:text-white">
                             {addr.label}
                           </Text>
                           {addr.isDefault && (
@@ -236,10 +236,10 @@ export default function DeliveryAddressesScreen() {
                             </View>
                           )}
                         </View>
-                        <Text className="text-sm text-[#777] mt-1">
+                        <Text className="text-sm text-[#777] dark:text-[#999] mt-1">
                           {addr.street}
                         </Text>
-                        <Text className="text-sm text-[#777]">
+                        <Text className="text-sm text-[#777] dark:text-[#999]">
                           {[addr.city, addr.state, addr.zipCode]
                             .filter(Boolean)
                             .join(', ')}
@@ -249,7 +249,7 @@ export default function DeliveryAddressesScreen() {
                     <View className="flex-row gap-2">
                       <TouchableOpacity
                         onPress={() => openEdit(addr)}
-                        className="w-9 h-9 rounded-full bg-[#F5F5F5] items-center justify-center"
+                        className="w-9 h-9 rounded-full bg-[#F5F5F5] dark:bg-[#3A3A3A] items-center justify-center"
                       >
                         <Pencil size={14} color="#666" />
                       </TouchableOpacity>
@@ -275,16 +275,16 @@ export default function DeliveryAddressesScreen() {
         presentationStyle="pageSheet"
         onRequestClose={() => setModalVisible(false)}
       >
-        <SafeAreaView className="flex-1 bg-[#FAFAFA]">
+        <SafeAreaView className="flex-1 bg-[#FAFAFA] dark:bg-[#121212]">
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             className="flex-1"
           >
-            <View className="flex-row items-center justify-between px-5 py-4 border-b border-[#F0F0F0]">
+            <View className="flex-row items-center justify-between px-5 py-4 border-b border-[#F0F0F0] dark:border-[#3A3A3A]">
               <TouchableOpacity onPress={() => setModalVisible(false)}>
                 <X size={24} color="#333" />
               </TouchableOpacity>
-              <Text className="text-lg font-bold text-[#1a1a1a]">
+              <Text className="text-lg font-bold text-[#1a1a1a] dark:text-white">
                 {editingId ? 'Edit Address' : 'New Address'}
               </Text>
               <View className="w-6" />
@@ -292,7 +292,7 @@ export default function DeliveryAddressesScreen() {
 
             <ScrollView className="flex-1 px-5" showsVerticalScrollIndicator={false}>
               {/* Label Selector */}
-              <Text className="text-xs font-semibold text-[#999] uppercase tracking-wider mt-6 mb-3 ml-1">
+              <Text className="text-xs font-semibold text-[#999] dark:text-[#777] uppercase tracking-wider mt-6 mb-3 ml-1">
                 Address Label
               </Text>
               <View className="flex-row gap-3 mb-6">
@@ -373,7 +373,7 @@ export default function DeliveryAddressesScreen() {
                 >
                   {form.isDefault && <Check size={14} color="#fff" />}
                 </View>
-                <Text className="text-sm font-medium text-[#555]">
+                <Text className="text-sm font-medium text-[#555] dark:text-[#999]">
                   Set as default delivery address
                 </Text>
               </TouchableOpacity>
@@ -426,11 +426,11 @@ function Field({
 }) {
   return (
     <View>
-      <Text className="text-xs font-semibold text-[#999] uppercase tracking-wider mb-2 ml-1">
+      <Text className="text-xs font-semibold text-[#999] dark:text-[#777] uppercase tracking-wider mb-2 ml-1">
         {label}
       </Text>
       <View
-        className="bg-white rounded-2xl px-4 py-4"
+        className="bg-white dark:bg-[#2A2A2A] rounded-2xl px-4 py-4"
         style={{
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 1 },
@@ -440,7 +440,7 @@ function Field({
         }}
       >
         <TextInput
-          className="text-base text-[#333] font-medium"
+          className="text-base text-[#333] dark:text-[#E0E0E0] font-medium"
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}

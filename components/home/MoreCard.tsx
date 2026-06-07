@@ -20,7 +20,7 @@ export function MoreCard({ meal, grid }: { meal: SideMeal; grid?: boolean }) {
   return (
     <TouchableOpacity
       ref={cardRef}
-      className={`rounded-3xl p-4 bg-[#FDFFFF] justify-between ${grid ? 'flex-1 h-52' : 'w-44 h-52'}`}
+      className={`rounded-3xl p-4 bg-[#FDFFFF] dark:bg-[#2A2A2A] justify-between ${grid ? 'flex-1 h-52' : 'w-44 h-52'}`}
       activeOpacity={0.85}
       onPress={handlePress}
     >
@@ -29,14 +29,14 @@ export function MoreCard({ meal, grid }: { meal: SideMeal; grid?: boolean }) {
       </View>
       <View className="flex-row justify-between items-end">
         <View className="gap-0.5">
-          <Text className="font-semibold text-sm text-gray-900">{meal.name}</Text>
+          <Text className="font-semibold text-sm text-gray-900 dark:text-white">{meal.name}</Text>
           <View className="flex-row gap-0.5">
             {[1, 2, 3, 4, 5].map((i) => {
               const color = meal.rating >= i ? '#FBBF24' : '#D1D5DB';
               return <Star key={i} size={13} color={color} fill={color} />;
             })}
           </View>
-          <Text className="text-xs text-gray-400">{meal.reviews} Reviews</Text>
+          <Text className="text-xs text-gray-400 dark:text-gray-500">{meal.reviews} Reviews</Text>
         </View>
         <Text className="font-bold text-red-500 text-lg">{meal.price} {meal.currency}</Text>
       </View>

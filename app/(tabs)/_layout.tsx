@@ -1,21 +1,24 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
+import { useColorScheme } from 'react-native';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { Home, ShoppingCart, User, Settings } from 'lucide-react-native';
 
 export default function TabLayout() {
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: '#EF4444',
-        tabBarInactiveTintColor: '#A3A3A3',
+        tabBarInactiveTintColor: isDark ? '#666' : '#A3A3A3',
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarShowLabel: false,
         tabBarStyle: {
-          backgroundColor: '#FFFFFF',
+          backgroundColor: isDark ? '#1a1a1a' : '#FFFFFF',
           borderTopWidth: 0,
           elevation: 10,
           shadowColor: '#000000',

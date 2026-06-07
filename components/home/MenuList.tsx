@@ -20,7 +20,7 @@ export function MenuList({ activeCategory, onSeeAll, searchedQuery }: { activeCa
         data={filteredMeals.filter((meal) => meal.name.toLowerCase().includes(searchedQuery.toLowerCase()))}
         keyExtractor={(item) => item.firestoreId}
         renderItem={({ item }) => <MealCard meal={item} />}
-        ListEmptyComponent={<View className='flex-1 justify-center items-center my-40'><Text className='text-xl font-bold text-gray-500'>No meals found</Text></View>}
+        ListEmptyComponent={<View className='flex-1 justify-center items-center my-40'><Text className='text-xl font-bold text-gray-500 dark:text-gray-400'>No meals found</Text></View>}
         contentContainerStyle={{ flexGrow: 1 }}
         horizontal
         showsHorizontalScrollIndicator={false}

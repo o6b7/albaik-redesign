@@ -46,12 +46,12 @@ export default function SeeAllScreen() {
   const title = isMeals ? 'Hot & New' : 'More';
 
   return (
-    <SafeAreaView className="flex-1 bg-[#F5F5F5]" edges={['top']}>
+    <SafeAreaView className="flex-1 bg-[#F5F5F5] dark:bg-[#121212]" edges={['top']}>
       <View className="flex-row items-center px-4 py-3 gap-3">
         <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7}>
-          <ArrowLeft size={24} color="#000" />
+          <ArrowLeft size={24} color="#888" />
         </TouchableOpacity>
-        <Text className="font-bold text-xl">{title}</Text>
+        <Text className="font-bold text-xl dark:text-white">{title}</Text>
       </View>
 
       {isMeals ? <MealsGrid /> : <MoreGrid />}

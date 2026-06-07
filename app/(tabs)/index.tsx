@@ -15,7 +15,7 @@ export default function HomeScreen() {
   const router = useRouter();
 
   return (
-    <SafeAreaView className="flex-1 bg-[#F5F5F5]" edges={['top']}>
+    <SafeAreaView className="flex-1 bg-[#F5F5F5] dark:bg-[#121212]" edges={['top']}>
       <ScrollView
         contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
