@@ -1,4 +1,4 @@
-import { FlatList, TouchableOpacity, View, Text } from 'react-native';
+import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 
 import { useCollection } from '@/hooks/useFirestore';
 import { CategoryTabsSkeleton } from './Skeleton';
@@ -18,7 +18,7 @@ export function CategoryTabs({ activeCategory, setActiveCategory }: { activeCate
   if (loading) return <CategoryTabsSkeleton />
 
   return (
-    <View className="bg-gray-100 rounded-md mb-2">
+    <View className="bg-gray-100 dark:bg-[#121212] rounded-md mb-2">
       <FlatList
         horizontal
         data={categories}
@@ -36,7 +36,7 @@ export function CategoryTabs({ activeCategory, setActiveCategory }: { activeCate
                 }`}
             >
               <Text
-                className={`font-bold ${isActive ? 'text-white' : 'text-black'
+                className={`font-bold ${isActive ? 'text-white' : 'text-black dark:text-gray-300'
                   }`}
               >
                 {item.category}

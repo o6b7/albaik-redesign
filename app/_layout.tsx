@@ -14,9 +14,9 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import '../global.css';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useAuthStore } from '@/store/auth-store';
 import { useFlyingItemStore } from '@/store/flying-item-store';
+import { useThemeStore } from '@/store/theme-store';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const IMAGE_SIZE = 150;
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
 });
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  const theme = useThemeStore((state) => state.theme);
   const user = useAuthStore((state) => state.user);
   const [ready, setReady] = useState(false);
   const segments = useSegments();
@@ -124,22 +124,23 @@ export default function RootLayout() {
 
   if (!ready) {
     return (
-      <View className="flex-1 items-center justify-center bg-white">
+      <View className="flex-1 items-center justify-center bg-white dark:bg-[#121212]">
         <ActivityIndicator size="large" color="#C0392B" />
       </View>
     );
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={theme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="profile" options={{ headerShown: false }} />
         <Stack.Screen name="see-all/[type]" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>
       <FlyingItemOverlay />
-      <StatusBar style="auto" />
+      <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
     </ThemeProvider>
   );
 }

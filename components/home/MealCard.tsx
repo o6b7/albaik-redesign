@@ -20,7 +20,7 @@ export function MealCard({ meal, grid }: { meal: Meal; grid?: boolean }) {
 
   return (
     <TouchableOpacity
-      className={`py-4 bg-gray-100 rounded-md items-center justify-center ${grid ? 'flex-1' : ''}`}
+      className={`py-4 bg-gray-100 dark:bg-[#121212] rounded-md items-center justify-center ${grid ? 'flex-1' : ''}`}
       activeOpacity={0.9}
       onPress={handlePress}
     >

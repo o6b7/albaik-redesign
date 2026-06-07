@@ -31,7 +31,18 @@ export default function LoginScreen() {
             });
             router.replace('/(tabs)' as any);
         } catch (error: any) {
-            Alert.alert('Login Failed', error.message);
+            const code = error.code;
+            let message = 'Something went wrong. Please try again.';
+            if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') {
+                message = 'Incorrect email or password. Please try again.';
+            } else if (code === 'auth/invalid-email') {
+                message = 'Please enter a valid email address.';
+            } else if (code === 'auth/too-many-requests') {
+                message = 'Too many failed attempts. Please try again later.';
+            } else if (code === 'auth/user-disabled') {
+                message = 'This account has been disabled. Contact support.';
+            }
+            Alert.alert('Login Failed', message);
         } finally {
             setLoading(false);
         }

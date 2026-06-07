@@ -66,7 +66,7 @@ export default function MealDetailScreen() {
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
-      <SafeAreaView className="flex-1 bg-white" edges={['bottom']}>
+      <SafeAreaView className="flex-1 bg-white dark:bg-[#121212]" edges={['bottom']}>
         {/* Hero */}
         <View className="w-full" style={{ height: 280, backgroundColor: meal?.bgColor ?? '#8A151B' }}>
           <Pressable
@@ -90,17 +90,17 @@ export default function MealDetailScreen() {
 
         <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
           <View className="p-5">
-            <Text className="text-gray-400 text-sm mb-1">{meal?.category}</Text>
+            <Text className="text-gray-400 dark:text-gray-500 text-sm mb-1">{meal?.category}</Text>
             <View className="flex-row justify-between items-center mb-3">
-              <Text className="text-gray-900 font-bold text-3xl">{meal?.name}</Text>
-              <Text className="text-gray-900 font-bold text-xl">{meal?.price} {meal?.currency}</Text>
+              <Text className="text-gray-900 dark:text-white font-bold text-3xl">{meal?.name}</Text>
+              <Text className="text-gray-900 dark:text-white font-bold text-xl">{meal?.price} {meal?.currency}</Text>
             </View>
 
             {meal?.description && (
-              <Text className="text-gray-500 text-sm leading-5 mb-6">{meal.description}</Text>
+              <Text className="text-gray-500 dark:text-gray-400 text-sm leading-5 mb-6">{meal.description}</Text>
             )}
 
-            <Text className="text-gray-900 font-bold text-xl mb-2">Topping</Text>
+            <Text className="text-gray-900 dark:text-white font-bold text-xl mb-2">Topping</Text>
             <View className='px-3'>
               {TOPPINGS.map((topping) => {
                 const checked = checkedToppings.has(topping.id);
@@ -116,7 +116,7 @@ export default function MealDetailScreen() {
                       >
                         {checked && <Check size={14} color="#fff" strokeWidth={3} />}
                       </View>
-                      <Text className="text-gray-800 text-sm">{topping.name}</Text>
+                      <Text className="text-gray-800 dark:text-gray-200 text-sm">{topping.name}</Text>
                     </View>
                     <Text className="text-green-600 text-sm font-medium">
                       {topping.price === 'free' ? '$free' : `$${topping.price}`}
@@ -129,15 +129,15 @@ export default function MealDetailScreen() {
         </ScrollView>
 
         {/* Bottom bar */}
-        <View className="px-5 pb-4 pt-3 border-t border-gray-100">
+        <View className="px-5 pb-4 pt-3 border-t border-gray-100 dark:border-[#2A2A2A]">
           <View className="items-center mb-4">
-            <View className="flex-row items-center border border-gray-300 rounded-full px-6 py-2 gap-6">
+            <View className="flex-row items-center border border-gray-300 dark:border-gray-600 rounded-full px-6 py-2 gap-6">
               <Pressable onPress={() => setQuantity(q => Math.max(1, q - 1))}>
-                <Minus size={18} color="#111" />
+                <Minus size={18} color="#888" />
               </Pressable>
-              <Text className="text-gray-900 font-bold text-base w-4 text-center">{quantity}</Text>
+              <Text className="text-gray-900 dark:text-white font-bold text-base w-4 text-center">{quantity}</Text>
               <Pressable onPress={() => setQuantity(q => q + 1)}>
-                <Plus size={18} color="#111" />
+                <Plus size={18} color="#888" />
               </Pressable>
             </View>
           </View>
