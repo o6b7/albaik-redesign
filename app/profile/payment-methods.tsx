@@ -65,7 +65,7 @@ const emptyForm = {
   cardNumber: '',
   expiryMonth: '',
   expiryYear: '',
-  cardType: 'other' as const,
+  cardType: 'other' as PaymentMethod['cardType'],
   isDefault: false,
 };
 

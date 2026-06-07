@@ -43,7 +43,7 @@ const LABEL_CONFIG = {
 } as const;
 
 const emptyForm = {
-  label: 'Home' as const,
+  label: 'Home' as Address['label'],
   street: '',
   city: '',
   state: '',
