@@ -1,12 +1,14 @@
+import { useSavedMeals } from '@/hooks/useSavedMeals';
 import { useRouter } from 'expo-router';
 import { Heart, Star } from 'lucide-react-native';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 
 import { Meal } from './types';
 
 export function MealCard({ meal, grid }: { meal: Meal; grid?: boolean }) {
-  const [isLiked, setIsLiked] = useState(false);
+  const { isSaved, toggle } = useSavedMeals();
+  const liked = isSaved(meal.firestoreId);
   const router = useRouter();
   const cardRef = useRef<View>(null);
 
@@ -30,16 +32,16 @@ export function MealCard({ meal, grid }: { meal: Meal; grid?: boolean }) {
             <Text className='font-bold text-lg text-white' numberOfLines={1}>{meal.name}</Text>
             <Text className='text-white text-sm' numberOfLines={1}>{meal.description}</Text>
           </View>
-          <TouchableOpacity onPress={() => setIsLiked(!isLiked)} activeOpacity={0.7}>
-            <Heart size={20} color={isLiked ? '#CBD5E1' : '#fff'} fill={isLiked ? '#CBD5E1' : 'transparent'} />
+          <TouchableOpacity onPress={() => toggle(meal.firestoreId, 'featured')} activeOpacity={0.7}>
+            <Heart size={20} color={liked ? '#F87171' : '#fff'} fill={liked ? '#F87171' : 'transparent'} />
           </TouchableOpacity>
         </View>
 
         <View className='items-center' style={{ overflow: 'visible' }}>
-          <View style={{ shadowColor: '#fff', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.6, shadowRadius: 25, overflow: 'visible' }}>
+          <View style={{ shadowColor: '#fff', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.6, shadowRadius: 25 }}>
             <Image
               source={{ uri: meal.image }}
-              style={grid ? { width: 100, height: 100 } : { width: 140, height: 140, overflow: 'visible' }}
+              style={grid ? { width: 100, height: 100 } : { width: 140, height: 140 }}
               resizeMode="contain"
             />
           </View>

@@ -5,10 +5,10 @@ import { useState } from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useCollection } from '@/hooks/useFirestore';
+import { useSavedMeals } from '@/hooks/useSavedMeals';
 import { useCartStore } from '@/store/cart-store';
 import { useFlyingItemStore } from '@/store/flying-item-store';
-
-import { useCollection } from '@/hooks/useFirestore';
 
 const TOPPINGS = [
   { id: 1, name: 'Add pickle', price: 'free' },
@@ -23,7 +23,7 @@ export default function MealDetailScreen() {
   const { id, type, cardX, cardY } = useLocalSearchParams<{ id: string; type: string; cardX: string; cardY: string }>();
   const [checkedToppings, setCheckedToppings] = useState<Set<number>>(new Set([1]));
   const [quantity, setQuantity] = useState(1);
-  const [liked, setLiked] = useState(false);
+  const { isSaved, toggle } = useSavedMeals();
   const addItem = useCartStore((state) => state.addItem);
   const triggerFly = useFlyingItemStore((state) => state.trigger);
 
@@ -68,7 +68,7 @@ export default function MealDetailScreen() {
       <Stack.Screen options={{ headerShown: false }} />
       <SafeAreaView className="flex-1 bg-white dark:bg-[#121212]" edges={['bottom']}>
         {/* Hero */}
-        <View className="w-full" style={{ height: 280, backgroundColor: meal?.bgColor ?? '#8A151B' }}>
+        <View className="w-full" style={{ height: 300, backgroundColor: meal?.bgColor ?? '#8A151B' }}>
           <Pressable
             onPress={() => router.back()}
             className="absolute left-4 w-10 h-10 rounded-full bg-white items-center justify-center z-10"
@@ -77,14 +77,19 @@ export default function MealDetailScreen() {
             <ArrowLeft size={20} color="#111" />
           </Pressable>
           <View
-            className="flex-1 justify-center top-5"
-            style={{ shadowColor: '#fff', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.9, shadowRadius: 30, overflow: 'visible' }}
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
           >
-            <Image
-              source={{ uri: meal?.image }}
-              className="w-full h-52"
-              resizeMode="contain"
-            />
+            <View style={{ shadowColor: '#fff', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.9, shadowRadius: 30 }}>
+              <Image
+                source={{ uri: meal?.image }}
+                style={{ width: 260, height: 260 }}
+                resizeMode="contain"
+              />
+            </View>
           </View>
         </View>
 
@@ -148,8 +153,8 @@ export default function MealDetailScreen() {
             >
               <Text className="text-white font-bold text-base">Add to Cart</Text>
             </Pressable>
-            <Pressable onPress={() => setLiked(l => !l)} className="w-14 h-14 bg-[#C0392B] rounded-2xl items-center justify-center">
-              <Heart size={22} color="#fff" fill={liked ? '#fff' : 'transparent'} />
+            <Pressable onPress={() => meal && toggle(meal.firestoreId, type === 'featured' ? 'featured' : 'more')} className="w-14 h-14 bg-[#C0392B] rounded-2xl items-center justify-center">
+              <Heart size={22} color="#fff" fill={meal && isSaved(meal.firestoreId) ? '#fff' : 'transparent'} />
             </Pressable>
           </View>
         </View>

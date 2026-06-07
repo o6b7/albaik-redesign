@@ -20,12 +20,12 @@ export function MoreCard({ meal, grid }: { meal: SideMeal; grid?: boolean }) {
   return (
     <TouchableOpacity
       ref={cardRef}
-      className={`rounded-3xl p-4 bg-[#FDFFFF] dark:bg-[#2A2A2A] justify-between ${grid ? 'flex-1 h-52' : 'w-44 h-52'}`}
+      className={`rounded-3xl p-4 bg-[#FDFFFF] dark:bg-[#2A2A2A] justify-between ${grid ? 'flex-1 h-60' : 'w-52 h-60'}`}
       activeOpacity={0.85}
       onPress={handlePress}
     >
-      <View className='items-center'>
-        <Image source={{ uri: meal.image }} className='w-32 h-32' resizeMode="contain" />
+      <View className='items-center' style={{ overflow: 'hidden' }}>
+        <Image source={{ uri: meal.image }} style={{ width: 120, height: 120 }} resizeMode="contain" />
       </View>
       <View className="flex-row justify-between items-end">
         <View className="gap-0.5">

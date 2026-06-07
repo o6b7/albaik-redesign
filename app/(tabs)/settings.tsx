@@ -47,144 +47,196 @@ export default function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-[#FAFAFA] dark:bg-[#121212]">
-      <Text className="text-xl font-bold text-center my-8 text-[#1a1a1a] dark:text-white">
-        Settings
-      </Text>
-
+    <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? '#0F0F0F' : '#fff' }}>
       <ScrollView
-        className="flex-1 px-5"
-        showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 40 }}
+        showsVerticalScrollIndicator={false}
       >
-        {/* Appearance */}
-        <Text className="text-xs font-semibold text-[#999] dark:text-[#777] uppercase tracking-wider mb-3 ml-1">
-          Appearance
-        </Text>
-        <View
-          className="bg-white dark:bg-[#2A2A2A] rounded-2xl mb-6"
+        {/* Title */}
+        <Text
           style={{
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.06,
-            shadowRadius: 8,
-            elevation: 3,
+            fontSize: 28,
+            fontWeight: '800',
+            color: isDark ? '#F5F5F5' : '#111',
+            paddingHorizontal: 20,
+            paddingTop: 16,
+            paddingBottom: 24,
           }}
         >
-          <View className="flex-row items-center justify-between px-4 py-4">
-            <View className="flex-row items-center">
-              <View
-                className="w-10 h-10 rounded-xl items-center justify-center mr-3"
-                style={{ backgroundColor: isDark ? '#2C2C3A' : '#FFF8E1' }}
+          Settings
+        </Text>
+
+        {/* Appearance */}
+        <SectionHeader label="Appearance" isDark={isDark} />
+        <View
+          style={{
+            marginHorizontal: 20,
+            backgroundColor: isDark ? '#1A1A1A' : '#F7F7F7',
+            borderRadius: 12,
+            marginBottom: 20,
+          }}
+        >
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              paddingVertical: 12,
+              paddingHorizontal: 16,
+            }}
+          >
+            {isDark ? (
+              <Moon size={20} color="#A78BFA" />
+            ) : (
+              <Sun size={20} color="#F59E0B" />
+            )}
+            <View style={{ flex: 1, marginLeft: 14 }}>
+              <Text
+                style={{
+                  fontSize: 15,
+                  fontWeight: '500',
+                  color: isDark ? '#E0E0E0' : '#222',
+                }}
               >
-                {isDark ? (
-                  <Moon size={20} color="#A78BFA" />
-                ) : (
-                  <Sun size={20} color="#F59E0B" />
-                )}
-              </View>
-              <View>
-                <Text className="text-base font-semibold text-[#333] dark:text-[#E0E0E0]">
-                  Dark Mode
-                </Text>
-                <Text className="text-xs text-[#999] dark:text-[#777] mt-0.5">
-                  {isDark ? 'Dark theme active' : 'Light theme active'}
-                </Text>
-              </View>
+                Dark Mode
+              </Text>
             </View>
             <Switch
               value={isDark}
               onValueChange={toggleDarkMode}
-              trackColor={{ false: '#E0E0E0', true: '#C0392B' }}
+              trackColor={{ false: '#D4D4D4', true: '#C0392B' }}
               thumbColor="#fff"
             />
           </View>
         </View>
 
         {/* Legal */}
-        <Text className="text-xs font-semibold text-[#999] dark:text-[#777] uppercase tracking-wider mb-3 ml-1">
-          Legal
-        </Text>
+        <SectionHeader label="Legal" isDark={isDark} />
         <View
-          className="bg-white dark:bg-[#2A2A2A] rounded-2xl mb-6"
           style={{
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.06,
-            shadowRadius: 8,
-            elevation: 3,
+            marginHorizontal: 20,
+            backgroundColor: isDark ? '#1A1A1A' : '#F7F7F7',
+            borderRadius: 12,
+            overflow: 'hidden',
+            marginBottom: 20,
           }}
         >
-          <TouchableOpacity
-            className="flex-row items-center justify-between px-4 py-4 border-b border-[#F0F0F0] dark:border-[#3A3A3A]"
+          <LinkRow
+            icon={FileText}
+            label="Terms & Conditions"
             onPress={() =>
               Linking.openURL('https://www.albaik.com/en/terms-conditions')
             }
-          >
-            <View className="flex-row items-center">
-              <View className="w-10 h-10 rounded-xl bg-[#EEF0FF] dark:bg-[#2A2A4A] items-center justify-center mr-3">
-                <FileText size={20} color="#3B5998" />
-              </View>
-              <Text className="text-base font-semibold text-[#333] dark:text-[#E0E0E0]">
-                Terms & Conditions
-              </Text>
-            </View>
-            <ChevronRight size={18} color="#999" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            className="flex-row items-center justify-between px-4 py-4"
+            isDark={isDark}
+          />
+          <LinkRow
+            icon={Shield}
+            label="Privacy Policy"
             onPress={() =>
               Linking.openURL('https://www.albaik.com/en/privacy-policy')
             }
-          >
-            <View className="flex-row items-center">
-              <View className="w-10 h-10 rounded-xl bg-[#F0FFF4] dark:bg-[#1A2E1A] items-center justify-center mr-3">
-                <Shield size={20} color="#2D8B4E" />
-              </View>
-              <Text className="text-base font-semibold text-[#333] dark:text-[#E0E0E0]">
-                Privacy Policy
-              </Text>
-            </View>
-            <ChevronRight size={18} color="#999" />
-          </TouchableOpacity>
+            isDark={isDark}
+            border
+          />
         </View>
 
-        {/* Account */}
-        <Text className="text-xs font-semibold text-[#999] dark:text-[#777] uppercase tracking-wider mb-3 ml-1">
-          Account
-        </Text>
-        <View
-          className="bg-white dark:bg-[#2A2A2A] rounded-2xl mb-8"
-          style={{
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.06,
-            shadowRadius: 8,
-            elevation: 3,
-          }}
-        >
+        {/* Logout */}
+        <View style={{ paddingHorizontal: 20, marginBottom: 32 }}>
           <TouchableOpacity
-            className="flex-row items-center justify-between px-4 py-4"
             onPress={handleLogout}
+            activeOpacity={0.5}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              paddingVertical: 14,
+              borderRadius: 12,
+              backgroundColor: isDark ? '#1A1A1A' : '#F7F7F7',
+            }}
           >
-            <View className="flex-row items-center">
-              <View className="w-10 h-10 rounded-xl bg-[#FFF0EE] dark:bg-[#3A1A1A] items-center justify-center mr-3">
-                <LogOut size={20} color="#C0392B" />
-              </View>
-              <Text className="text-base font-semibold text-[#C0392B]">
-                Log Out
-              </Text>
-            </View>
-            <ChevronRight size={18} color="#C0392B" />
+            <LogOut size={18} color="#C0392B" />
+            <Text
+              style={{
+                fontSize: 15,
+                fontWeight: '600',
+                color: '#C0392B',
+                marginLeft: 8,
+              }}
+            >
+              Log Out
+            </Text>
           </TouchableOpacity>
         </View>
 
         {/* Version */}
-        <Text className="text-center text-xs text-[#BCBCBC] dark:text-[#555]">
-          Version {APP_VERSION}
+        <Text
+          style={{
+            textAlign: 'center',
+            fontSize: 12,
+            color: isDark ? '#444' : '#C8C8C8',
+          }}
+        >
+          Al Baik v{APP_VERSION}
         </Text>
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+function SectionHeader({ label, isDark }: { label: string; isDark: boolean }) {
+  return (
+    <Text
+      style={{
+        fontSize: 13,
+        fontWeight: '600',
+        color: isDark ? '#555' : '#999',
+        paddingHorizontal: 20,
+        marginBottom: 6,
+      }}
+    >
+      {label}
+    </Text>
+  );
+}
+
+function LinkRow({
+  icon: Icon,
+  label,
+  onPress,
+  isDark,
+  border,
+}: {
+  icon: typeof FileText;
+  label: string;
+  onPress: () => void;
+  isDark: boolean;
+  border?: boolean;
+}) {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.5}
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 14,
+        paddingHorizontal: 16,
+        borderTopWidth: border ? 1 : 0,
+        borderTopColor: isDark ? '#252525' : '#EBEBEB',
+      }}
+    >
+      <Icon size={20} color={isDark ? '#888' : '#666'} />
+      <Text
+        style={{
+          flex: 1,
+          fontSize: 15,
+          fontWeight: '500',
+          color: isDark ? '#E0E0E0' : '#222',
+          marginLeft: 14,
+        }}
+      >
+        {label}
+      </Text>
+      <ChevronRight size={18} color={isDark ? '#444' : '#ccc'} />
+    </TouchableOpacity>
   );
 }
