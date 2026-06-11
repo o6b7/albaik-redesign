@@ -20,7 +20,7 @@ export function MoreCard({ meal, grid }: { meal: SideMeal; grid?: boolean }) {
   return (
     <TouchableOpacity
       ref={cardRef}
-      className={`rounded-3xl p-4 bg-[#FDFFFF] dark:bg-[#2A2A2A] justify-between ${grid ? 'flex-1 h-60' : 'w-52 h-60'}`}
+      className={`rounded-3xl p-4 bg-[#FDFFFF] dark:bg-[#2A2A2A] justify-between ${grid ? 'flex-1 min-h-60' : 'w-52 min-h-60'}`}
       activeOpacity={0.85}
       onPress={handlePress}
     >

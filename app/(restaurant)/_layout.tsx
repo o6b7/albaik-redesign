@@ -2,32 +2,25 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 
 import { useTabScreenOptions } from '@/components/navigation/tab-screen-options';
-import { Home, Settings, ShoppingCart, User } from 'lucide-react-native';
+import { ClipboardList, Settings, Store } from 'lucide-react-native';
 
-export default function TabLayout() {
+export default function RestaurantTabLayout() {
   const screenOptions = useTabScreenOptions();
 
   return (
     <Tabs screenOptions={screenOptions}>
       <Tabs.Screen
-        name="index"
+        name="orders"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <Home size={28} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="cart"
-        options={{
-          title: 'Cart',
-          tabBarIcon: ({ color }) => <ShoppingCart size={28} color={color} />,
+          title: 'Orders',
+          tabBarIcon: ({ color }) => <ClipboardList size={28} color={color} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color }) => <User size={28} color={color} />,
+          tabBarIcon: ({ color }) => <Store size={28} color={color} />,
         }}
       />
       <Tabs.Screen

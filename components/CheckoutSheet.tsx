@@ -1,10 +1,8 @@
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import {
   Check,
-  ChevronRight,
   CreditCard,
   MapPin,
-  Plus,
   ShieldCheck,
 } from 'lucide-react-native';
 import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
@@ -18,28 +16,9 @@ import {
 } from 'react-native';
 
 import { useUserCollection } from '@/hooks/useUserCollection';
+import { Address, PaymentMethod } from '@/lib/types';
 import { CartItem, useCartStore } from '@/store/cart-store';
 import { OrderItem, useOrders } from '@/store/order-store';
-
-interface PaymentMethod {
-  id: string;
-  cardholderName: string;
-  cardNumber: string;
-  expiryMonth: string;
-  expiryYear: string;
-  cardType: 'visa' | 'mastercard' | 'amex' | 'other';
-  isDefault: boolean;
-}
-
-interface Address {
-  id: string;
-  label: 'Home' | 'Work' | 'Other';
-  street: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  isDefault: boolean;
-}
 
 interface CheckoutSheetProps {
   items: CartItem[];
@@ -54,7 +33,7 @@ const CARD_TYPE_COLORS: Record<string, string> = {
 };
 
 export const CheckoutSheet = forwardRef<BottomSheet, CheckoutSheetProps>(
-  ({ items, onOrderPlaced }, ref) => {
+  function CheckoutSheet({ items, onOrderPlaced }, ref) {
     const isDark = useColorScheme() === 'dark';
     const snapPoints = useMemo(() => ['85%'], []);
     const clearCart = useCartStore((state) => state.clearCart);
@@ -132,7 +111,6 @@ export const CheckoutSheet = forwardRef<BottomSheet, CheckoutSheetProps>(
           addressLabel: address.label,
           addressStreet: address.street,
           addressCity: address.city,
-          stage: 'verifying',
           createdAt: now.toISOString(),
           estimatedDelivery: estimated.toISOString(),
         });
@@ -506,10 +484,10 @@ export const CheckoutSheet = forwardRef<BottomSheet, CheckoutSheetProps>(
                   <ActivityIndicator size="small" color="#fff" />
                 ) : (
                   <>
-                    <Text style={{ color: '#fff', fontSize: 16, fontWeight: '800' }}>
+                    <Text maxFontSizeMultiplier={1.2} style={{ color: '#fff', fontSize: 16, fontWeight: '800' }}>
                       Place Order
                     </Text>
-                    <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 14, fontWeight: '600' }}>
+                    <Text maxFontSizeMultiplier={1.2} style={{ color: 'rgba(255,255,255,0.7)', fontSize: 14, fontWeight: '600' }}>
                       · ${total.toFixed(2)}
                     </Text>
                   </>

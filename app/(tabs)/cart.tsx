@@ -23,6 +23,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CheckoutSheet } from '@/components/CheckoutSheet';
+import { customerStageFromStatus } from '@/constants/delivery';
 import { CartItem, useCartStore } from '@/store/cart-store';
 import { useOrders } from '@/store/order-store';
 
@@ -173,13 +174,16 @@ export default function CartScreen() {
               <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 3, gap: 4 }}>
                 <Clock size={12} color="#B45309" />
                 <Text style={{ fontSize: 12, color: '#B45309', fontWeight: '500' }}>
-                  {activeOrder.stage === 'verifying'
-                    ? 'Verifying your order'
-                    : activeOrder.stage === 'cooking'
-                    ? 'Preparing your food'
-                    : activeOrder.stage === 'driver'
-                    ? 'Assigning driver'
-                    : 'On the way to you'}
+                  {(() => {
+                    const stage = customerStageFromStatus(activeOrder.status);
+                    return stage === 'verifying'
+                      ? 'Waiting for confirmation'
+                      : stage === 'cooking'
+                      ? 'Preparing your food'
+                      : stage === 'driver'
+                      ? 'Driver picking up your order'
+                      : 'On the way to you';
+                  })()}
                 </Text>
               </View>
             </View>

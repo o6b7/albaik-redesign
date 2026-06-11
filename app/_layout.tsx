@@ -114,12 +114,29 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (!ready) return;
-    const inAuth = (segments[0] as string) === '(auth)';
-    if (!user && !inAuth) {
-      router.replace('/(auth)/login' as any);
-    } else if (user && inAuth) {
-      router.replace('/(tabs)' as any);
+    const root = segments[0] as string;
+    const inAuth = root === '(auth)';
+    const inDriverArea = root === '(driver)' || root === 'driver-order';
+    const inRestaurantArea = root === '(restaurant)' || root === 'restaurant-order';
+
+    if (!user) {
+      if (!inAuth) router.replace('/(auth)/login' as any);
+      return;
     }
+
+    // Authenticated — keep each role inside its own area.
+    const role = user.role ?? 'customer';
+    const home =
+      role === 'driver' ? '/(driver)/orders'
+      : role === 'restaurant' ? '/(restaurant)/orders'
+      : '/(tabs)';
+
+    const inForeignArea =
+      role === 'driver' ? !inDriverArea
+      : role === 'restaurant' ? !inRestaurantArea
+      : inDriverArea || inRestaurantArea;
+
+    if (inAuth || inForeignArea) router.replace(home as any);
   }, [user, ready, segments]);
 
   if (!ready) {
@@ -135,10 +152,14 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(driver)" options={{ headerShown: false }} />
+        <Stack.Screen name="(restaurant)" options={{ headerShown: false }} />
         <Stack.Screen name="profile" options={{ headerShown: false }} />
         <Stack.Screen name="see-all/[type]" options={{ headerShown: false }} />
         <Stack.Screen name="order/[id]" options={{ headerShown: false }} />
         <Stack.Screen name="order/history" options={{ headerShown: false }} />
+        <Stack.Screen name="driver-order/[id]" options={{ headerShown: false }} />
+        <Stack.Screen name="restaurant-order/[id]" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>
       <FlyingItemOverlay />

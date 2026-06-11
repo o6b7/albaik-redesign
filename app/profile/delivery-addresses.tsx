@@ -26,15 +26,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-interface Address {
-  id: string;
-  label: 'Home' | 'Work' | 'Other';
-  street: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  isDefault: boolean;
-}
+import { Address } from '@/lib/types';
 
 const LABEL_CONFIG = {
   Home: { Icon: Home, bg: '#FFF0EE', color: '#C0392B' },

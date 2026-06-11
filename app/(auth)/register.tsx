@@ -28,6 +28,7 @@ export default function RegisterScreen() {
                 fullName,
                 email,
                 phone: phone || null,
+                role: 'customer',
                 createdAt: new Date().toISOString(),
             });
 
@@ -36,6 +37,7 @@ export default function RegisterScreen() {
                 email: user.email!,
                 fullName,
                 phone: phone || undefined,
+                role: 'customer',
             });
 
             router.replace('/(tabs)' as any);

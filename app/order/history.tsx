@@ -1,11 +1,13 @@
+import { ScreenHeader } from '@/components/ui/ScreenHeader';
+import { formatFullDate } from '@/lib/format';
 import { Order, useOrders } from '@/store/order-store';
 import { Stack, useRouter } from 'expo-router';
 import {
-  ArrowLeft,
   Check,
   CreditCard,
   MapPin,
   Package,
+  X,
 } from 'lucide-react-native';
 import {
   ActivityIndicator,
@@ -18,24 +20,17 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-function formatDate(iso: string) {
-  const d = new Date(iso);
-  return d.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
 export default function OrderHistoryScreen() {
   const router = useRouter();
   const isDark = useColorScheme() === 'dark';
   const { pastOrders, loading } = useOrders();
 
-  const renderOrder = ({ item }: { item: Order }) => (
-    <View
+  const renderOrder = ({ item }: { item: Order }) => {
+    const cancelled = item.status === 'cancelled';
+    return (
+    <TouchableOpacity
+      onPress={() => router.push(`/order/${item.id}` as any)}
+      activeOpacity={0.85}
       style={{
         backgroundColor: isDark ? '#2A2A2A' : '#fff',
         borderRadius: 16,
@@ -63,25 +58,25 @@ export default function OrderHistoryScreen() {
               width: 24,
               height: 24,
               borderRadius: 12,
-              backgroundColor: '#10B981',
+              backgroundColor: cancelled ? '#E53E3E' : '#10B981',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Check size={12} color="#fff" />
+            {cancelled ? <X size={12} color="#fff" /> : <Check size={12} color="#fff" />}
           </View>
           <Text
             style={{
               fontSize: 13,
               fontWeight: '600',
-              color: '#10B981',
+              color: cancelled ? '#E53E3E' : '#10B981',
             }}
           >
-            Delivered
+            {cancelled ? 'Cancelled' : 'Delivered'}
           </Text>
         </View>
         <Text style={{ fontSize: 11, color: isDark ? '#777' : '#999' }}>
-          {formatDate(item.createdAt)}
+          {formatFullDate(item.createdAt)}
         </Text>
       </View>
 
@@ -166,52 +161,15 @@ export default function OrderHistoryScreen() {
           </Text>
         </View>
       </View>
-    </View>
-  );
+    </TouchableOpacity>
+    );
+  };
 
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
       <SafeAreaView className="flex-1 bg-[#FAFAFA] dark:bg-[#121212]">
-        {/* Header */}
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingHorizontal: 20,
-            paddingVertical: 14,
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 20,
-              backgroundColor: isDark ? '#2A2A2A' : '#fff',
-              alignItems: 'center',
-              justifyContent: 'center',
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.08,
-              shadowRadius: 8,
-              elevation: 3,
-            }}
-          >
-            <ArrowLeft size={20} color={isDark ? '#ccc' : '#333'} />
-          </TouchableOpacity>
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: '700',
-              color: isDark ? '#fff' : '#1a1a1a',
-            }}
-          >
-            Previous Orders
-          </Text>
-          <View style={{ width: 40 }} />
-        </View>
+        <ScreenHeader title="Previous Orders" />
 
         {loading ? (
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>

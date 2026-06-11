@@ -23,13 +23,22 @@ export default function LoginScreen() {
             const { user } = await signInWithEmailAndPassword(auth, email, password);
             const userDoc = await getDoc(doc(db, 'users', user.uid));
             const userData = userDoc.data();
+            const role =
+                userData?.role === 'driver' ? 'driver'
+                : userData?.role === 'restaurant' ? 'restaurant'
+                : 'customer';
             setUser({
                 uid: user.uid,
                 email: user.email!,
                 fullName: userData?.fullName ?? '',
                 phone: userData?.phone,
+                role,
             });
-            router.replace('/(tabs)' as any);
+            const home =
+                role === 'driver' ? '/(driver)/orders'
+                : role === 'restaurant' ? '/(restaurant)/orders'
+                : '/(tabs)';
+            router.replace(home as any);
         } catch (error: any) {
             const code = error.code;
             let message = 'Something went wrong. Please try again.';
@@ -106,7 +115,7 @@ export default function LoginScreen() {
                         </Pressable>
 
                         <View className="flex-row justify-center mt-auto">
-                            <Text className="text-gray-400">Don't have an account? </Text>
+                            <Text className="text-gray-400">Don&apos;t have an account? </Text>
                             <Pressable onPress={() => (router as any).push('/(auth)/register')}>
                                 <Text className="text-[#C0392B] font-bold">Register</Text>
                             </Pressable>

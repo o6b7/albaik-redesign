@@ -24,15 +24,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-interface PaymentMethod {
-  id: string;
-  cardholderName: string;
-  cardNumber: string;
-  expiryMonth: string;
-  expiryYear: string;
-  cardType: 'visa' | 'mastercard' | 'amex' | 'other';
-  isDefault: boolean;
-}
+import { PaymentMethod } from '@/lib/types';
 
 const CARD_COLORS: Record<string, string> = {
   visa: '#1A1F71',

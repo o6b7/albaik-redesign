@@ -1,30 +1,46 @@
-import { db } from '@/firebase';
-import { useAuthStore } from '@/store/auth-store';
-import { ORDER_STAGES, Order, OrderStage, useOrders } from '@/store/order-store';
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { doc, getDoc } from 'firebase/firestore';
+import { DeliveryMap } from '@/components/DeliveryMap';
 import {
-  ArrowLeft,
+  DESTINATION,
+  DRIVER_ORIGIN,
+  PICKUP_WAYPOINTS,
+  RESTAURANT,
+  ROAD_WAYPOINTS,
+  customerStageFromStatus,
+  etaMinutesForKm,
+  haversineKm,
+  regionForCoords,
+} from '@/constants/delivery';
+import { ScreenHeader } from '@/components/ui/ScreenHeader';
+import { db } from '@/firebase';
+import { useRoute } from '@/hooks/use-route';
+import { useSmoothedPosition } from '@/hooks/use-smoothed-position';
+import { SCALED_TEXT } from '@/lib/a11y';
+import { formatTime } from '@/lib/format';
+import { ORDER_STAGES, Order, OrderStatus } from '@/store/order-store';
+import { Stack, useLocalSearchParams } from 'expo-router';
+import { doc, onSnapshot } from 'firebase/firestore';
+import {
   Bike,
   Check,
   ChefHat,
-  Clock,
   MapPin,
+  Phone,
   Search,
   Truck,
+  XCircle,
 } from 'lucide-react-native';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
   Easing,
+  Linking,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
   useColorScheme,
 } from 'react-native';
-import MapView, { Marker, Polyline } from 'react-native-maps';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const STAGE_ICONS: Record<string, typeof Search> = {
@@ -43,141 +59,39 @@ const STAGE_COLORS: Record<string, string> = {
   delivered: '#10B981',
 };
 
-// Dummy delivery route — waypoints following roads in Jeddah
-const RESTAURANT = { latitude: 21.4858, longitude: 39.1925 };
-const DESTINATION = { latitude: 21.4735, longitude: 39.1778 };
-
-const ROAD_WAYPOINTS = [
-  RESTAURANT,
-  { latitude: 21.4856, longitude: 39.1912 }, // head west on street
-  { latitude: 21.4852, longitude: 39.1898 },
-  { latitude: 21.4845, longitude: 39.1893 }, // slight turn south
-  { latitude: 21.4838, longitude: 39.1893 }, // continue south
-  { latitude: 21.4830, longitude: 39.1888 },
-  { latitude: 21.4822, longitude: 39.1878 }, // turn southwest
-  { latitude: 21.4815, longitude: 39.1868 },
-  { latitude: 21.4808, longitude: 39.1858 },
-  { latitude: 21.4800, longitude: 39.1852 }, // continue on road
-  { latitude: 21.4792, longitude: 39.1845 },
-  { latitude: 21.4785, longitude: 39.1838 },
-  { latitude: 21.4778, longitude: 39.1828 }, // bend west
-  { latitude: 21.4770, longitude: 39.1818 },
-  { latitude: 21.4762, longitude: 39.1810 },
-  { latitude: 21.4755, longitude: 39.1802 },
-  { latitude: 21.4748, longitude: 39.1795 },
-  { latitude: 21.4742, longitude: 39.1788 },
-  { latitude: 21.4738, longitude: 39.1783 },
-  DESTINATION,
+const PICKUP_PHASE: OrderStatus[] = [
+  'accepted',
+  'driving_to_restaurant',
+  'arrived_at_restaurant',
+  'meal_collected',
 ];
 
-function lerp(
-  a: { latitude: number; longitude: number },
-  b: { latitude: number; longitude: number },
-  t: number
-) {
-  return {
-    latitude: a.latitude + (b.latitude - a.latitude) * t,
-    longitude: a.longitude + (b.longitude - a.longitude) * t,
-  };
-}
-
-function positionOnRoute(
-  waypoints: { latitude: number; longitude: number }[],
-  progress: number
-) {
-  const t = Math.max(0, Math.min(1, progress));
-  const segCount = waypoints.length - 1;
-  const raw = t * segCount;
-  const seg = Math.min(Math.floor(raw), segCount - 1);
-  return lerp(waypoints[seg], waypoints[seg + 1], raw - seg);
-}
-
 export default function OrderTrackingScreen() {
-  const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const user = useAuthStore((state) => state.user);
   const isDark = useColorScheme() === 'dark';
 
-  const { updateStage } = useOrders();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentStage, setCurrentStage] = useState<OrderStage>('verifying');
-  const [elapsed, setElapsed] = useState(0);
-  const lastSyncedStage = useRef<OrderStage | null>(null);
-
-  const riderProgress = useRef(new Animated.Value(0)).current;
-  const [riderPos, setRiderPos] = useState(RESTAURANT);
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
-  // Fetch order
+  // Real-time order listener — reflects restaurant and driver actions instantly.
   useEffect(() => {
-    if (!user || !id) return;
-    (async () => {
-      try {
-        const docSnap = await getDoc(doc(db, 'users', user.uid, 'orders', id));
-        if (docSnap.exists()) {
-          setOrder({ id: docSnap.id, ...docSnap.data() } as Order);
-        }
-      } catch (e) {
-        console.error('Error fetching order:', e);
-      } finally {
+    if (!id) return;
+    const unsubscribe = onSnapshot(
+      doc(db, 'orders', id),
+      (snap) => {
+        setOrder(snap.exists() ? ({ id: snap.id, ...snap.data() } as Order) : null);
+        setLoading(false);
+      },
+      (e) => {
+        console.error('Error listening to order:', e);
         setLoading(false);
       }
-    })();
-  }, [user, id]);
+    );
+    return () => unsubscribe();
+  }, [id]);
 
-  // Timer: simulate 20 min in real-time (5 min per stage), sync to Firestore
-  useEffect(() => {
-    if (!order) return;
-
-    const createdAt = new Date(order.createdAt).getTime();
-
-    const stageForMinutes = (min: number): OrderStage => {
-      if (min < 5) return 'verifying';
-      if (min < 10) return 'cooking';
-      if (min < 15) return 'driver';
-      if (min < 20) return 'delivering';
-      return 'delivered';
-    };
-
-    const tick = () => {
-      const elapsedSec = Math.floor((Date.now() - createdAt) / 1000);
-      setElapsed(elapsedSec);
-
-      const newStage = stageForMinutes(elapsedSec / 60);
-      setCurrentStage(newStage);
-
-      if (newStage !== lastSyncedStage.current) {
-        lastSyncedStage.current = newStage;
-        updateStage(order.id, newStage);
-      }
-    };
-
-    tick();
-    const interval = setInterval(tick, 1000);
-    return () => clearInterval(interval);
-  }, [order, updateStage]);
-
-  // Rider animation when delivering
-  useEffect(() => {
-    if (currentStage !== 'delivering') return;
-
-    riderProgress.setValue(0);
-    Animated.timing(riderProgress, {
-      toValue: 1,
-      duration: 5 * 60 * 1000, // 5 minutes
-      easing: Easing.linear,
-      useNativeDriver: false,
-    }).start();
-
-    const listenerId = riderProgress.addListener(({ value }) => {
-      setRiderPos(positionOnRoute(ROAD_WAYPOINTS, value));
-    });
-
-    return () => riderProgress.removeListener(listenerId);
-  }, [currentStage]);
-
-  // Pulse animation for active stage
+  // Pulse animation for the active stage.
   useEffect(() => {
     const pulse = Animated.loop(
       Animated.sequence([
@@ -199,26 +113,69 @@ export default function OrderTrackingScreen() {
     return () => pulse.stop();
   }, []);
 
+  const status = order?.status;
+  const isCancelled = status === 'cancelled';
+  const isDelivered = status === 'delivered';
+  const currentStage = order && !isCancelled ? customerStageFromStatus(order.status) : 'verifying';
   const currentStageIndex = ORDER_STAGES.findIndex((s) => s.key === currentStage);
-  const totalRemaining = Math.max(0, 20 * 60 - elapsed);
-  const remainingMin = Math.floor(totalRemaining / 60);
-  const remainingSec = totalRemaining % 60;
 
-  const mapRegion = useMemo(() => {
-    let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
-    for (const wp of ROAD_WAYPOINTS) {
-      if (wp.latitude < minLat) minLat = wp.latitude;
-      if (wp.latitude > maxLat) maxLat = wp.latitude;
-      if (wp.longitude < minLng) minLng = wp.longitude;
-      if (wp.longitude > maxLng) maxLng = wp.longitude;
+  const isPickupPhase = !!status && PICKUP_PHASE.includes(status);
+  const isDeliveryPhase = status === 'driving_to_customer' || status === 'delivered';
+  const showMap = !!order?.driverId && (isPickupPhase || isDeliveryPhase);
+
+  // The driver's live position glides between throttled Firestore updates.
+  const smoothedDriverPos = useSmoothedPosition(order?.driverLocation ?? null, RESTAURANT);
+  const driverMarker = order?.driverLocation ? smoothedDriverPos : null;
+
+  // Road-following routes (same cache as the driver app — both sides draw the
+  // exact line the driver actually rides along).
+  const pickupRoute = useRoute(DRIVER_ORIGIN, RESTAURANT, PICKUP_WAYPOINTS);
+  const deliveryRoute = useRoute(RESTAURANT, DESTINATION, ROAD_WAYPOINTS);
+  const routeCoords = isPickupPhase ? pickupRoute.coords : deliveryRoute.coords;
+
+  const mapRegion = useMemo(() => regionForCoords(routeCoords), [routeCoords]);
+
+  // Live ETA from the driver's actual position once they're heading here.
+  // Straight-line distance is scaled by the route's road/straight ratio so the
+  // estimate accounts for actual street layout.
+  const liveEtaMin = useMemo(() => {
+    if (status !== 'driving_to_customer') return null;
+    const straightTotal = haversineKm(RESTAURANT, DESTINATION);
+    const roadFactor = straightTotal > 0 ? deliveryRoute.distanceKm / straightTotal : 1;
+    const remainingKm = order?.driverLocation
+      ? haversineKm(order.driverLocation, DESTINATION) * roadFactor
+      : deliveryRoute.distanceKm;
+    return etaMinutesForKm(remainingKm);
+  }, [status, order?.driverLocation, deliveryRoute.distanceKm]);
+
+  const hero = useMemo(() => {
+    if (!status) return null;
+    switch (status) {
+      case 'verifying':
+        return { title: 'Waiting for confirmation', sub: 'Al Baik is reviewing your order' };
+      case 'cooking':
+        return order?.foodReady
+          ? { title: 'Your food is ready', sub: 'Waiting for a driver to pick it up' }
+          : { title: 'Preparing your food', sub: 'The kitchen is working on your order' };
+      case 'accepted':
+      case 'driving_to_restaurant':
+        return {
+          title: 'Driver heading to Al Baik',
+          sub: `${order?.driverName ?? 'Your driver'} is on the way to the restaurant`,
+        };
+      case 'arrived_at_restaurant':
+        return {
+          title: 'Driver at the restaurant',
+          sub: order?.foodReady
+            ? 'Picking up your order now'
+            : 'Waiting for the kitchen to finish',
+        };
+      case 'meal_collected':
+        return { title: 'Order picked up', sub: 'Your food is with the driver' };
+      default:
+        return null;
     }
-    return {
-      latitude: (minLat + maxLat) / 2,
-      longitude: (minLng + maxLng) / 2,
-      latitudeDelta: (maxLat - minLat) * 1.6,
-      longitudeDelta: (maxLng - minLng) * 1.6,
-    };
-  }, []);
+  }, [status, order?.foodReady, order?.driverName]);
 
   if (loading) {
     return (
@@ -253,343 +210,323 @@ export default function OrderTrackingScreen() {
         className="flex-1 bg-[#FAFAFA] dark:bg-[#121212]"
         edges={['top']}
       >
-        {/* Header */}
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingHorizontal: 20,
-            paddingVertical: 14,
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 20,
-              backgroundColor: isDark ? '#2A2A2A' : '#fff',
-              alignItems: 'center',
-              justifyContent: 'center',
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.08,
-              shadowRadius: 8,
-              elevation: 3,
-            }}
-          >
-            <ArrowLeft size={20} color={isDark ? '#ccc' : '#333'} />
-          </TouchableOpacity>
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: '700',
-              color: isDark ? '#fff' : '#1a1a1a',
-            }}
-          >
-            Order Tracking
-          </Text>
-          <View style={{ width: 40 }} />
-        </View>
+        <ScreenHeader title="Order Tracking" />
 
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 30 }}
         >
-        {/* Timer */}
-        <View
-          style={{
-            alignItems: 'center',
-            paddingVertical: 16,
-          }}
-        >
-          {currentStage === 'delivered' ? (
-            <View style={{ alignItems: 'center' }}>
-              <View
-                style={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: 28,
-                  backgroundColor: '#10B981',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: 8,
-                }}
-              >
-                <Check size={28} color="#fff" />
-              </View>
-              <Text
-                style={{
-                  fontSize: 18,
-                  fontWeight: '800',
-                  color: '#10B981',
-                }}
-              >
-                Delivered!
-              </Text>
-            </View>
-          ) : (
-            <>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                <Clock size={16} color={isDark ? '#999' : '#777'} />
-                <Text style={{ fontSize: 13, color: isDark ? '#999' : '#777' }}>
-                  Estimated delivery
+          {/* Hero — stage-aware headline */}
+          <View style={{ alignItems: 'center', paddingVertical: 18, paddingHorizontal: 24 }}>
+            {isCancelled ? (
+              <View style={{ alignItems: 'center' }}>
+                <XCircle size={52} color="#E53E3E" style={{ marginBottom: 8 }} />
+                <Text style={{ fontSize: 18, fontWeight: '800', color: '#E53E3E' }}>
+                  Order cancelled
+                </Text>
+                <Text style={{ fontSize: 13, color: isDark ? '#888' : '#999', marginTop: 4 }}>
+                  The restaurant couldn&apos;t take this order
                 </Text>
               </View>
-              <Text
-                style={{
-                  fontSize: 36,
-                  fontWeight: '800',
-                  color: isDark ? '#fff' : '#1a1a1a',
-                  letterSpacing: -1,
-                }}
-              >
-                {remainingMin}:{remainingSec.toString().padStart(2, '0')}
-              </Text>
-              <Text style={{ fontSize: 12, color: isDark ? '#666' : '#bbb', marginTop: 2 }}>
-                minutes remaining
-              </Text>
-            </>
-          )}
-        </View>
-
-        {/* Stage Progress */}
-        <View
-          style={{
-            marginHorizontal: 20,
-            backgroundColor: isDark ? '#2A2A2A' : '#fff',
-            borderRadius: 20,
-            padding: 20,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.06,
-            shadowRadius: 8,
-            elevation: 3,
-          }}
-        >
-          {ORDER_STAGES.map((stage, index) => {
-            const isCompleted =
-              currentStage === 'delivered' || index < currentStageIndex;
-            const isActive = index === currentStageIndex && currentStage !== 'delivered';
-            const StageIcon = STAGE_ICONS[stage.key];
-            const stageColor = STAGE_COLORS[stage.key];
-            const isLast = index === ORDER_STAGES.length - 1;
-
-            return (
-              <View key={stage.key} style={{ flexDirection: 'row', marginBottom: isLast ? 0 : 4 }}>
-                {/* Left: Icon + Line */}
-                <View style={{ alignItems: 'center', width: 44 }}>
-                  <Animated.View
-                    style={[
-                      {
-                        width: 40,
-                        height: 40,
-                        borderRadius: 12,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: isCompleted
-                          ? '#10B981'
-                          : isActive
-                          ? stageColor
-                          : isDark
-                          ? '#333'
-                          : '#F0F0F0',
-                      },
-                      isActive ? { transform: [{ scale: pulseAnim }] } : {},
-                    ]}
-                  >
-                    {isCompleted ? (
-                      <Check size={18} color="#fff" />
-                    ) : (
-                      <StageIcon size={18} color={isActive ? '#fff' : isDark ? '#666' : '#bbb'} />
-                    )}
-                  </Animated.View>
-                  {!isLast && (
-                    <View
-                      style={{
-                        width: 2,
-                        height: 28,
-                        backgroundColor: isCompleted
-                          ? '#10B981'
-                          : isDark
-                          ? '#333'
-                          : '#E8E8E8',
-                        borderRadius: 1,
-                      }}
-                    />
-                  )}
-                </View>
-
-                {/* Right: Text */}
-                <View style={{ flex: 1, paddingLeft: 14, paddingTop: 4 }}>
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      fontWeight: isActive || isCompleted ? '700' : '500',
-                      color: isActive
-                        ? stageColor
-                        : isCompleted
-                        ? isDark
-                          ? '#E0E0E0'
-                          : '#333'
-                        : isDark
-                        ? '#666'
-                        : '#bbb',
-                    }}
-                  >
-                    {stage.label}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 11,
-                      color: isDark ? '#666' : '#bbb',
-                      marginTop: 2,
-                    }}
-                  >
-                    {isCompleted ? 'Completed' : isActive ? 'In progress...' : `~${stage.duration} min`}
-                  </Text>
-                </View>
-              </View>
-            );
-          })}
-        </View>
-
-        {/* Map (visible during delivering stage) */}
-        {(currentStage === 'delivering' || currentStage === 'delivered') && (
-          <View
-            style={{
-              margin: 20,
-              borderRadius: 20,
-              overflow: 'hidden',
-              height: 220,
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.08,
-              shadowRadius: 8,
-              elevation: 3,
-            }}
-          >
-            <MapView
-              style={{ flex: 1 }}
-              initialRegion={mapRegion}
-              userInterfaceStyle={isDark ? 'dark' : 'light'}
-              scrollEnabled={false}
-              zoomEnabled={false}
-              pitchEnabled={false}
-              rotateEnabled={false}
-            >
-              {/* Route line */}
-              <Polyline
-                coordinates={ROAD_WAYPOINTS}
-                strokeColor="#C0392B"
-                strokeWidth={4}
-              />
-
-              {/* Restaurant marker */}
-              <Marker coordinate={RESTAURANT} title="Al Baik" anchor={{ x: 0.5, y: 0.5 }}>
+            ) : isDelivered ? (
+              <View style={{ alignItems: 'center' }}>
                 <View
                   style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 16,
-                    backgroundColor: '#C0392B',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderWidth: 2,
-                    borderColor: '#fff',
-                  }}
-                >
-                  <ChefHat size={14} color="#fff" />
-                </View>
-              </Marker>
-
-              {/* Destination marker */}
-              <Marker coordinate={DESTINATION} title={order.addressLabel} anchor={{ x: 0.5, y: 0.5 }}>
-                <View
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 16,
+                    width: 56,
+                    height: 56,
+                    borderRadius: 28,
                     backgroundColor: '#10B981',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    borderWidth: 2,
-                    borderColor: '#fff',
+                    marginBottom: 8,
                   }}
                 >
-                  <MapPin size={14} color="#fff" />
+                  <Check size={28} color="#fff" />
                 </View>
-              </Marker>
-
-              {/* Rider marker */}
-              {currentStage === 'delivering' && (
-                <Marker coordinate={riderPos} title="Your rider" anchor={{ x: 0.5, y: 0.5 }}>
-                  <View
+                <Text style={{ fontSize: 18, fontWeight: '800', color: '#10B981' }}>
+                  Delivered!
+                </Text>
+                {order.deliveredAt && (
+                  <Text style={{ fontSize: 12, color: isDark ? '#888' : '#999', marginTop: 4 }}>
+                    at {formatTime(order.deliveredAt)}
+                  </Text>
+                )}
+              </View>
+            ) : liveEtaMin !== null ? (
+              <>
+                <Text style={{ fontSize: 13, color: isDark ? '#999' : '#777', marginBottom: 4 }}>
+                  Arriving in about
+                </Text>
+                <Text
+                  {...SCALED_TEXT}
+                  style={{
+                    fontSize: 36,
+                    fontWeight: '800',
+                    color: isDark ? '#fff' : '#1a1a1a',
+                    letterSpacing: -1,
+                  }}
+                >
+                  {liveEtaMin} min
+                </Text>
+                <Text style={{ fontSize: 12, color: isDark ? '#666' : '#bbb', marginTop: 2 }}>
+                  {order.driverName ?? 'Your driver'} is on the way to you
+                </Text>
+              </>
+            ) : (
+              hero && (
+                <>
+                  <Text
+                    {...SCALED_TEXT}
                     style={{
-                      width: 36,
-                      height: 36,
-                      borderRadius: 18,
-                      backgroundColor: '#F59E0B',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderWidth: 2,
-                      borderColor: '#fff',
-                      shadowColor: '#F59E0B',
-                      shadowOffset: { width: 0, height: 2 },
-                      shadowOpacity: 0.4,
-                      shadowRadius: 6,
-                      elevation: 4,
+                      fontSize: 22,
+                      fontWeight: '800',
+                      color: isDark ? '#fff' : '#1a1a1a',
+                      textAlign: 'center',
+                      letterSpacing: -0.5,
                     }}
                   >
-                    <Bike size={16} color="#fff" />
-                  </View>
-                </Marker>
-              )}
-            </MapView>
+                    {hero.title}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      color: isDark ? '#888' : '#999',
+                      marginTop: 6,
+                      textAlign: 'center',
+                    }}
+                  >
+                    {hero.sub}
+                  </Text>
+                </>
+              )
+            )}
           </View>
-        )}
 
-        {/* Order Details */}
-        <View
-          style={{
-            marginHorizontal: 20,
-            backgroundColor: isDark ? '#2A2A2A' : '#fff',
-            borderRadius: 16,
-            padding: 16,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: 0.04,
-            shadowRadius: 6,
-            elevation: 2,
-          }}
-        >
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
-            <Text style={{ fontSize: 12, color: isDark ? '#777' : '#999' }}>
-              {order.items.length} item{order.items.length > 1 ? 's' : ''}
-            </Text>
-            <Text style={{ fontSize: 12, color: isDark ? '#777' : '#999' }}>
-              {order.paymentCardType.toUpperCase()} ···· {order.paymentLast4}
-            </Text>
-          </View>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <MapPin size={14} color={isDark ? '#888' : '#999'} />
-              <Text
+          {/* Driver card with call action */}
+          {order.driverName && !isCancelled && !isDelivered && (
+            <View
+              style={{
+                marginHorizontal: 20,
+                marginBottom: 16,
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: isDark ? '#2A2A2A' : '#fff',
+                borderRadius: 16,
+                padding: 14,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.04,
+                shadowRadius: 6,
+                elevation: 2,
+              }}
+            >
+              <View
                 style={{
-                  fontSize: 13,
-                  color: isDark ? '#ccc' : '#555',
-                  fontWeight: '500',
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  backgroundColor: '#8B5CF6',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginRight: 12,
                 }}
               >
-                {order.addressLabel} — {order.addressStreet}
+                <Bike size={18} color="#fff" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 11, color: isDark ? '#888' : '#999' }}>
+                  Your driver
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 15,
+                    fontWeight: '700',
+                    color: isDark ? '#E8E8E8' : '#222',
+                    marginTop: 1,
+                  }}
+                >
+                  {order.driverName}
+                </Text>
+              </View>
+              {order.driverPhone && (
+                <TouchableOpacity
+                  onPress={() => Linking.openURL(`tel:${order.driverPhone}`).catch(() => {})}
+                  activeOpacity={0.8}
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    backgroundColor: isDark ? '#0E2A1A' : '#ECFDF3',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Phone size={17} color="#10B981" />
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+
+          {/* Live map — visible as soon as a driver is assigned */}
+          {showMap && (
+            <View style={{ marginHorizontal: 20, marginBottom: 16 }}>
+              <DeliveryMap
+                isDark={isDark}
+                region={mapRegion}
+                routeCoords={routeCoords}
+                driver={isDelivered ? null : driverMarker}
+                target={isPickupPhase ? RESTAURANT : DESTINATION}
+                targetKind={isPickupPhase ? 'restaurant' : 'customer'}
+                origin={isPickupPhase ? undefined : RESTAURANT}
+                height={220}
+              />
+            </View>
+          )}
+
+          {/* Stage Progress */}
+          {!isCancelled && (
+            <View
+              style={{
+                marginHorizontal: 20,
+                backgroundColor: isDark ? '#2A2A2A' : '#fff',
+                borderRadius: 20,
+                padding: 20,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.06,
+                shadowRadius: 8,
+                elevation: 3,
+              }}
+            >
+              {ORDER_STAGES.map((stage, index) => {
+                const isCompleted =
+                  currentStage === 'delivered' || index < currentStageIndex;
+                const isActive = index === currentStageIndex && currentStage !== 'delivered';
+                const StageIcon = STAGE_ICONS[stage.key];
+                const stageColor = STAGE_COLORS[stage.key];
+                const isLast = index === ORDER_STAGES.length - 1;
+
+                return (
+                  <View key={stage.key} style={{ flexDirection: 'row', marginBottom: isLast ? 0 : 4 }}>
+                    {/* Left: Icon + Line */}
+                    <View style={{ alignItems: 'center', width: 44 }}>
+                      <Animated.View
+                        style={[
+                          {
+                            width: 40,
+                            height: 40,
+                            borderRadius: 12,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: isCompleted
+                              ? '#10B981'
+                              : isActive
+                              ? stageColor
+                              : isDark
+                              ? '#333'
+                              : '#F0F0F0',
+                          },
+                          isActive ? { transform: [{ scale: pulseAnim }] } : {},
+                        ]}
+                      >
+                        {isCompleted ? (
+                          <Check size={18} color="#fff" />
+                        ) : (
+                          <StageIcon size={18} color={isActive ? '#fff' : isDark ? '#666' : '#bbb'} />
+                        )}
+                      </Animated.View>
+                      {!isLast && (
+                        <View
+                          style={{
+                            width: 2,
+                            height: 28,
+                            backgroundColor: isCompleted
+                              ? '#10B981'
+                              : isDark
+                              ? '#333'
+                              : '#E8E8E8',
+                            borderRadius: 1,
+                          }}
+                        />
+                      )}
+                    </View>
+
+                    {/* Right: Text */}
+                    <View style={{ flex: 1, paddingLeft: 14, paddingTop: 4 }}>
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          fontWeight: isActive || isCompleted ? '700' : '500',
+                          color: isActive
+                            ? stageColor
+                            : isCompleted
+                            ? isDark
+                              ? '#E0E0E0'
+                              : '#333'
+                            : isDark
+                            ? '#666'
+                            : '#bbb',
+                        }}
+                      >
+                        {stage.label}
+                      </Text>
+                      <Text
+                        style={{
+                          fontSize: 11,
+                          color: isDark ? '#666' : '#bbb',
+                          marginTop: 2,
+                        }}
+                      >
+                        {isCompleted ? 'Completed' : isActive ? 'In progress...' : `~${stage.duration} min`}
+                      </Text>
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+          )}
+
+          {/* Order Details */}
+          <View
+            style={{
+              marginHorizontal: 20,
+              marginTop: 20,
+              backgroundColor: isDark ? '#2A2A2A' : '#fff',
+              borderRadius: 16,
+              padding: 16,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.04,
+              shadowRadius: 6,
+              elevation: 2,
+            }}
+          >
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+              <Text style={{ fontSize: 12, color: isDark ? '#777' : '#999' }}>
+                {order.items.length} item{order.items.length > 1 ? 's' : ''}
+              </Text>
+              <Text style={{ fontSize: 12, color: isDark ? '#777' : '#999' }}>
+                {order.paymentCardType.toUpperCase()} ···· {order.paymentLast4}
               </Text>
             </View>
-            <Text style={{ fontSize: 15, fontWeight: '800', color: '#C0392B' }}>
-              ${order.total.toFixed(2)}
-            </Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <MapPin size={14} color={isDark ? '#888' : '#999'} />
+                <Text
+                  style={{
+                    fontSize: 13,
+                    color: isDark ? '#ccc' : '#555',
+                    fontWeight: '500',
+                  }}
+                >
+                  {order.addressLabel} — {order.addressStreet}
+                </Text>
+              </View>
+              <Text style={{ fontSize: 15, fontWeight: '800', color: '#C0392B' }}>
+                ${order.total.toFixed(2)}
+              </Text>
+            </View>
           </View>
-        </View>
         </ScrollView>
       </SafeAreaView>
     </>

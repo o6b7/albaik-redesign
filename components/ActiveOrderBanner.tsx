@@ -1,17 +1,20 @@
+import { customerStageFromStatus } from '@/constants/delivery';
 import { Order } from '@/store/order-store';
 import { useRouter } from 'expo-router';
 import { ChevronRight, Clock, Package } from 'lucide-react-native';
 import { Text, TouchableOpacity, View } from 'react-native';
 
 const STAGE_LABELS: Record<string, string> = {
-  verifying: 'Verifying your order',
+  verifying: 'Waiting for confirmation',
   cooking: 'Preparing your food',
-  driver: 'Assigning driver',
+  driver: 'Driver picking up your order',
   delivering: 'On the way to you',
+  delivered: 'Delivered',
 };
 
 export function ActiveOrderBanner({ order }: { order: Order }) {
   const router = useRouter();
+  const stage = customerStageFromStatus(order.status);
 
   return (
     <TouchableOpacity
@@ -58,7 +61,7 @@ export function ActiveOrderBanner({ order }: { order: Order }) {
         >
           <Clock size={12} color="#B45309" />
           <Text style={{ fontSize: 12, color: '#B45309', fontWeight: '500' }}>
-            {STAGE_LABELS[order.stage] ?? order.stage}
+            {STAGE_LABELS[stage] ?? stage}
           </Text>
         </View>
       </View>
