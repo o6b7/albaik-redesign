@@ -121,7 +121,7 @@ export default function OrderHistoryScreen() {
                 color: isDark ? '#ccc' : '#555',
               }}
             >
-              ${(parseFloat(orderItem.price) * orderItem.quantity).toFixed(2)}
+              ⃁{(parseFloat(orderItem.price) * orderItem.quantity).toFixed(2)}
             </Text>
           </View>
         ))}

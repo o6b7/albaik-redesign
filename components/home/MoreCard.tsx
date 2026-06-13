@@ -38,7 +38,7 @@ export function MoreCard({ meal, grid }: { meal: SideMeal; grid?: boolean }) {
           </View>
           <Text className="text-xs text-gray-400 dark:text-gray-500">{meal.reviews} Reviews</Text>
         </View>
-        <Text className="font-bold text-red-500 text-lg">{meal.price} {meal.currency}</Text>
+        <Text className="font-bold text-red-500 text-lg">⃁{meal.price}</Text>
       </View>
     </TouchableOpacity>
   );

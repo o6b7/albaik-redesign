@@ -72,7 +72,7 @@ export default function CartScreen() {
           </Text>
         )}
         <Text className="text-gray-900 dark:text-white font-bold text-sm mt-1">
-          ${parseFloat(item.price)} {item.currency}
+          ⃁{parseFloat(item.price)}
         </Text>
       </View>
       <View className="items-center gap-2">

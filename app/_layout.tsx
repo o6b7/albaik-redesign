@@ -38,7 +38,6 @@ function FlyingItemOverlay() {
   useEffect(() => {
     if (!item) return;
 
-    // Start from where the card was on the home screen
     translateX.value = item.startX - IMAGE_SIZE / 2;
     translateY.value = item.startY - IMAGE_SIZE / 2;
     scale.value = 1;
@@ -124,7 +123,6 @@ export default function RootLayout() {
       return;
     }
 
-    // Authenticated — keep each role inside its own area.
     const role = user.role ?? 'customer';
     const home =
       role === 'driver' ? '/(driver)/orders'
@@ -160,7 +158,6 @@ export default function RootLayout() {
         <Stack.Screen name="order/history" options={{ headerShown: false }} />
         <Stack.Screen name="driver-order/[id]" options={{ headerShown: false }} />
         <Stack.Screen name="restaurant-order/[id]" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>
       <FlyingItemOverlay />
       <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />

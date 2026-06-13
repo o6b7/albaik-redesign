@@ -48,7 +48,6 @@ export const CheckoutSheet = forwardRef<BottomSheet, CheckoutSheetProps>(
     const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
     const [placing, setPlacing] = useState(false);
 
-    // Auto-select defaults
     useEffect(() => {
       if (payments.length > 0 && !selectedPayment) {
         const def = payments.find((p) => p.isDefault) ?? payments[0];
@@ -217,7 +216,7 @@ export const CheckoutSheet = forwardRef<BottomSheet, CheckoutSheetProps>(
                         color: isDark ? '#E0E0E0' : '#333',
                       }}
                     >
-                      ${(parseFloat(item.price) * item.quantity).toFixed(2)}
+                      ⃁{(parseFloat(item.price) * item.quantity).toFixed(2)}
                     </Text>
                   </View>
                 ))}
@@ -230,8 +229,8 @@ export const CheckoutSheet = forwardRef<BottomSheet, CheckoutSheetProps>(
                   }}
                 />
 
-                <Row label="Subtotal" value={`$${subtotal.toFixed(2)}`} isDark={isDark} />
-                <Row label="VAT (15%)" value={`$${vat.toFixed(2)}`} isDark={isDark} />
+                <Row label="Subtotal" value={`⃁${subtotal.toFixed(2)}`} isDark={isDark} />
+                <Row label="VAT (15%)" value={`⃁${vat.toFixed(2)}`} isDark={isDark} />
                 <View
                   style={{
                     height: 1,
@@ -262,7 +261,7 @@ export const CheckoutSheet = forwardRef<BottomSheet, CheckoutSheetProps>(
                       color: '#C0392B',
                     }}
                   >
-                    ${total.toFixed(2)}
+                    ⃁{total.toFixed(2)}
                   </Text>
                 </View>
               </View>

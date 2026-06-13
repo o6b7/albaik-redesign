@@ -43,7 +43,6 @@ export default function RestaurantOrderDetailScreen() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Live — the screen keeps updating if it's open while the order progresses.
   useEffect(() => {
     if (!id) return;
     const unsubscribe = onSnapshot(
@@ -211,7 +210,7 @@ export default function RestaurantOrderDetailScreen() {
                     )}
                   </View>
                   <Text style={{ fontSize: 13, fontWeight: '600', color: isDark ? '#ccc' : '#555' }}>
-                    ${(parseFloat(item.price) * item.quantity).toFixed(2)}
+                    ⃁{(parseFloat(item.price) * item.quantity).toFixed(2)}
                   </Text>
                 </View>
               ))}

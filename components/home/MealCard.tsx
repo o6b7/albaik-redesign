@@ -58,7 +58,7 @@ export function MealCard({ meal, grid }: { meal: Meal; grid?: boolean }) {
             <Text className="text-white text-xs ml-1">{meal.reviews} Reviews</Text>
           </View>
           <View className='bg-white rounded-l-lg px-2 py-1 left-5'>
-            <Text className='text-red-500 font-bold'>{meal.price} {meal.currency}</Text>
+            <Text className='text-red-500 font-bold'>⃁{meal.price}</Text>
           </View>
         </View>
       </View>

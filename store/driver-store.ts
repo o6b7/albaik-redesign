@@ -67,7 +67,6 @@ export function useDriverOrders() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Available pool
   useEffect(() => {
     if (!user) {
       setLoading(false);
@@ -93,7 +92,6 @@ export function useDriverOrders() {
     return () => unsubscribe();
   }, [user]);
 
-  // This driver's own orders
   useEffect(() => {
     if (!user) return;
     const q = query(collection(db, 'orders'), where('driverId', '==', user.uid));

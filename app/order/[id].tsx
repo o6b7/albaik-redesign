@@ -74,7 +74,6 @@ export default function OrderTrackingScreen() {
   const [loading, setLoading] = useState(true);
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
-  // Real-time order listener — reflects restaurant and driver actions instantly.
   useEffect(() => {
     if (!id) return;
     const unsubscribe = onSnapshot(
@@ -91,7 +90,6 @@ export default function OrderTrackingScreen() {
     return () => unsubscribe();
   }, [id]);
 
-  // Pulse animation for the active stage.
   useEffect(() => {
     const pulse = Animated.loop(
       Animated.sequence([
@@ -123,21 +121,15 @@ export default function OrderTrackingScreen() {
   const isDeliveryPhase = status === 'driving_to_customer' || status === 'delivered';
   const showMap = !!order?.driverId && (isPickupPhase || isDeliveryPhase);
 
-  // The driver's live position glides between throttled Firestore updates.
   const smoothedDriverPos = useSmoothedPosition(order?.driverLocation ?? null, RESTAURANT);
   const driverMarker = order?.driverLocation ? smoothedDriverPos : null;
 
-  // Road-following routes (same cache as the driver app — both sides draw the
-  // exact line the driver actually rides along).
   const pickupRoute = useRoute(DRIVER_ORIGIN, RESTAURANT, PICKUP_WAYPOINTS);
   const deliveryRoute = useRoute(RESTAURANT, DESTINATION, ROAD_WAYPOINTS);
   const routeCoords = isPickupPhase ? pickupRoute.coords : deliveryRoute.coords;
 
   const mapRegion = useMemo(() => regionForCoords(routeCoords), [routeCoords]);
 
-  // Live ETA from the driver's actual position once they're heading here.
-  // Straight-line distance is scaled by the route's road/straight ratio so the
-  // estimate accounts for actual street layout.
   const liveEtaMin = useMemo(() => {
     if (status !== 'driving_to_customer') return null;
     const straightTotal = haversineKm(RESTAURANT, DESTINATION);

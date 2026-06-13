@@ -57,7 +57,6 @@ export default function AccountInformationScreen() {
     phone: '',
   });
 
-  // Password change
   const [showPasswordSection, setShowPasswordSection] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -86,7 +85,6 @@ export default function AccountInformationScreen() {
       }
     } catch (error) {
       console.error('Error fetching account data:', error);
-      // Fallback to store data
       const fallback = {
         fullName: user.fullName,
         email: user.email,
@@ -141,7 +139,6 @@ export default function AccountInformationScreen() {
     try {
       if (!user) throw new Error('No user');
 
-      // Sign in fresh to ensure we have a valid currentUser
       const { user: firebaseUser } = await signInWithEmailAndPassword(
         auth,
         user.email,

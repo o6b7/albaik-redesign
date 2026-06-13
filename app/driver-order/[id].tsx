@@ -83,7 +83,6 @@ export default function DriverOrderDetailScreen() {
   const progress = useRef(new Animated.Value(0)).current;
   const lastLocationWrite = useRef(0);
 
-  // Live order
   useEffect(() => {
     if (!id) return;
     const unsubscribe = onSnapshot(
@@ -104,16 +103,12 @@ export default function DriverOrderDetailScreen() {
   const foodReady = !!order?.foodReady;
   const isPickup = !!status && PICKUP_STATUSES.includes(status);
 
-  // Road-following routes (shared cache with the customer's tracking screen,
-  // so both sides draw the exact same line).
   const pickupRoute = useRoute(DRIVER_ORIGIN, RESTAURANT, PICKUP_WAYPOINTS);
   const deliveryRoute = useRoute(RESTAURANT, DESTINATION, ROAD_WAYPOINTS);
   const pickupPath = useMemo(() => buildRoutePath(pickupRoute.coords), [pickupRoute.coords]);
   const deliveryPath = useMemo(() => buildRoutePath(deliveryRoute.coords), [deliveryRoute.coords]);
   const activeCoords = isPickup ? pickupRoute.coords : deliveryRoute.coords;
 
-  // Drive the moving marker based on the live status, and share the position
-  // with the customer via throttled Firestore writes.
   useEffect(() => {
     if (!status || !id) return;
 
@@ -144,7 +139,6 @@ export default function DriverOrderDetailScreen() {
       return animateAlong(deliveryPath, 90 * 1000);
     }
 
-    // Static positions for the non-driving states.
     progress.stopAnimation();
     if (status === 'accepted') setDriverPos(DRIVER_ORIGIN);
     else if (status === 'arrived_at_restaurant' || status === 'meal_collected')
@@ -154,7 +148,6 @@ export default function DriverOrderDetailScreen() {
 
   const region = useMemo(() => regionForCoords(activeCoords), [activeCoords]);
 
-  // Collect Meal is gated on the kitchen finishing the food.
   const waitingForKitchen = status === 'arrived_at_restaurant' && !foodReady;
 
   const handleAdvance = async () => {
@@ -165,7 +158,6 @@ export default function DriverOrderDetailScreen() {
     try {
       await advanceOrderStatus(order.id, action.next, driverPos);
     } catch {
-      // the live listener keeps the UI consistent
     } finally {
       setSubmitting(false);
     }
@@ -198,7 +190,6 @@ export default function DriverOrderDetailScreen() {
   const currentIndex = DRIVER_STAGES.findIndex((s) => s.key === status);
   const action = NEXT_ACTION[status];
   const target = isPickup ? RESTAURANT : DESTINATION;
-  // Distance/ETA from the actual road route once it has loaded.
   const legKm = isPickup ? pickupRoute.distanceKm : deliveryRoute.distanceKm;
   const etaMin = etaMinutesForKm(legKm);
   const isDelivered = status === 'delivered';
@@ -418,7 +409,7 @@ export default function DriverOrderDetailScreen() {
             >
               <Text style={{ fontSize: 13, color: isDark ? '#999' : '#777' }}>Your earnings</Text>
               <Text style={{ fontSize: 15, fontWeight: '800', color: '#10B981' }}>
-                {order.earnings} SAR
+                ⃁{order.earnings}
               </Text>
             </View>
           </View>

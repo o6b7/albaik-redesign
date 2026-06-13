@@ -81,7 +81,7 @@ export default function DriverOrdersScreen() {
         >
           <SummaryPill
             icon={<TrendingUp size={15} color="#10B981" />}
-            value={`${todayEarnings} SAR`}
+            value={`⃁${todayEarnings}`}
             label="Earned today"
             isDark={isDark}
           />
@@ -289,10 +289,7 @@ function AvailableOrderCard({
           }}
         >
           <Text {...DENSE_TEXT} style={{ fontSize: 15, fontWeight: '800', color: '#10B981' }}>
-            {order.earnings}
-          </Text>
-          <Text {...DENSE_TEXT} style={{ fontSize: 11, fontWeight: '600', color: '#10B981' }}>
-            SAR
+            ⃁{order.earnings}
           </Text>
         </View>
       </View>
@@ -481,7 +478,7 @@ function PreviousOrderCard({
           </Text>
         </View>
         <Text style={{ fontSize: 15, fontWeight: '800', color: '#10B981' }}>
-          +{order.earnings} SAR
+          +⃁{order.earnings}
         </Text>
       </View>
 

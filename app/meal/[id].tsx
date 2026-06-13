@@ -98,7 +98,7 @@ export default function MealDetailScreen() {
             <Text className="text-gray-400 dark:text-gray-500 text-sm mb-1">{meal?.category}</Text>
             <View className="flex-row justify-between items-center mb-3">
               <Text className="text-gray-900 dark:text-white font-bold text-3xl">{meal?.name}</Text>
-              <Text className="text-gray-900 dark:text-white font-bold text-xl">{meal?.price} {meal?.currency}</Text>
+              <Text className="text-gray-900 dark:text-white font-bold text-xl">⃁{meal?.price}</Text>
             </View>
 
             {meal?.description && (
@@ -124,7 +124,7 @@ export default function MealDetailScreen() {
                       <Text className="text-gray-800 dark:text-gray-200 text-sm">{topping.name}</Text>
                     </View>
                     <Text className="text-green-600 text-sm font-medium">
-                      {topping.price === 'free' ? '$free' : `$${topping.price}`}
+                      {topping.price === 'free' ? '⃁free' : `⃁${topping.price}`}
                     </Text>
                   </Pressable>
                 );

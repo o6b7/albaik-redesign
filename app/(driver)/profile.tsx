@@ -74,7 +74,7 @@ export default function DriverProfileScreen() {
         <View style={{ flexDirection: 'row', gap: 12, paddingHorizontal: 20 }}>
           <StatCard
             icon={<TrendingUp size={20} color="#10B981" />}
-            value={`${totalEarnings} SAR`}
+            value={`⃁${totalEarnings}`}
             label="Total earnings"
           />
           <StatCard

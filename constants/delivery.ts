@@ -10,7 +10,6 @@ export const RESTAURANT: LatLng = { latitude: 21.4858, longitude: 39.1925 };
 export const RESTAURANT_NAME = 'Al Baik - Al Rawdah';
 export const RESTAURANT_ADDRESS = 'Al Rawdah District, Jeddah';
 
-// Customer (drop-off)
 export const DESTINATION: LatLng = { latitude: 21.4735, longitude: 39.1778 };
 
 // Dummy delivery route — waypoints following roads in Jeddah (restaurant → customer)
@@ -141,8 +140,6 @@ export function computeEarnings(distanceKm: number): number {
 export function etaMinutesForKm(km: number): number {
   return Math.max(1, Math.round(km * 3));
 }
-
-// ---- Driver delivery state machine ----
 
 export interface DriverStage {
   key: OrderStatus;
